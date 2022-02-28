@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "chatbots",
+  "info": {
+    "singularName": "chatbot",
+    "pluralName": "chatbots",
+    "displayName": "chatbot",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "tg_user_id": {
+      "type": "biginteger"
+    },
+    "tg_user_name": {
+      "type": "string"
+    },
+    "tg_first_name": {
+      "type": "string"
+    },
+    "tg_last_name": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "biginteger"
+    }
+  }
+}

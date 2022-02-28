@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "orders",
+  "info": {
+    "singularName": "order",
+    "pluralName": "orders",
+    "displayName": "Order",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user_id": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "orders"
+    },
+    "date_start": {
+      "type": "datetime"
+    },
+    "date_end": {
+      "type": "datetime"
+    },
+    "people_count": {
+      "type": "integer",
+      "min": 1,
+      "max": 15
+    },
+    "comment": {
+      "type": "text"
+    },
+    "date_skip": {
+      "type": "integer",
+      "max": 2,
+      "min": 0,
+      "default": 2
+    },
+    "pay": {
+      "type": "decimal"
+    },
+    "promocode": {
+      "type": "string"
+    }
+  }
+}
