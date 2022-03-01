@@ -53,6 +53,7 @@ module.exports = {
   rules: {
     'max-len': 0,
     semi: 'off',
+    'object-curly-newline': 'off',
     'comma-dangle': 'off',
     '@typescript-eslint/comma-dangle': 'off',
     requireConfigFile: 0,

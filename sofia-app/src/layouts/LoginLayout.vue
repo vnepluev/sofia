@@ -4,7 +4,7 @@
 
     <!-- (Optional) The Header -->
     <q-header elevated>
-      <q-toolbar>
+      <q-toolbar class="m-1">
         <q-icon size="2rem" name="img:logo.svg" />
         <q-toolbar-title>Прогулки на яхте</q-toolbar-title>
       </q-toolbar>
@@ -13,7 +13,7 @@
     <!-- (Optional) The Footer -->
     <q-footer>
       <q-tabs switch-indicator>
-        <q-route-tab icon="map" to="/" replace label="Вход" />
+        <q-route-tab icon="anchor" to="/" replace label="Вход" />
         <q-route-tab icon="assignment" to="/register" replace label="Регистрация" />
       </q-tabs>
     </q-footer>
