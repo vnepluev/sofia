@@ -51,7 +51,9 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    'no-tabs': 0,
     'max-len': 0,
+    indent: 0,
     semi: 'off',
     'object-curly-newline': 'off',
     'comma-dangle': 'off',

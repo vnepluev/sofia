@@ -6,7 +6,7 @@
     <q-header elevated>
       <q-toolbar class="m-1">
         <q-icon size="2rem" name="img:logo.svg" />
-        <q-toolbar-title>Прогулки на яхте</q-toolbar-title>
+        <q-toolbar-title class="text-h5">Прогулки на яхте</q-toolbar-title>
       </q-toolbar>
     </q-header>
 

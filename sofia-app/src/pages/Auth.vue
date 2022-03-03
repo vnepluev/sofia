@@ -10,6 +10,7 @@
           <q-form class="space-y-2" @submit="submitForm">
             <!-- В форму ввода телефона добавить mask="+7(###)###-##-##" unmasked-value -->
             <q-input
+              type="tel"
               v-model="formData.phone"
               label="номер телефона"
               mask="+7 (###) ###-##-##"
