@@ -22,21 +22,9 @@
           <q-form class="space-y-2" @submit="submitForm">
             <!-- В форму ввода телефона добавить mask="+7(###)###-##-##" unmasked-value -->
 
-            <quasar-input type="tel" v-model="formData.phone" @isValid="isPhoneValid" />
-            <!-- <quasar-input type="password" v-model="formData.password" @isValid="isPasswordValid" /> -->
+            <quasar-input type="tel" v-model="formData.phone" />
+            <quasar-input type="password" v-model="formData.password" />
 
-            <q-input
-              v-model="formData.password"
-              label="пароль"
-              type="password"
-              outlined
-              :rules="[isPasswordValid]"
-              maxlength="32"
-            >
-              <template v-slot:prepend>
-                <q-icon name="lock" class="block" />
-              </template>
-            </q-input>
             <q-btn
               class="full-width bg-teal text-white"
               type="submit"
@@ -66,16 +54,9 @@ export default defineComponent({
       password: ''
     })
 
-    const isPhoneValid = (isValid) => (typeof isValid === 'boolean')
-    const isPasswordValid = (pass) => new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(pass.length > 5 || 'Введен короткий пароль')
-      }, 1000)
-    })
+    const isFormValid = computed(() => formData.phone.length === 10 && formData.password.length > 5)
 
-    const isFormValid = computed(() => isPhoneValid && formData.password.length > 5)
-
-    return { formData, isPhoneValid, isPasswordValid, isFormValid }
+    return { formData, isFormValid }
   },
 
   methods: {
