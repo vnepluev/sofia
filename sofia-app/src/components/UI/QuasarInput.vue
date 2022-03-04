@@ -2,14 +2,15 @@
 Иконки https://fonts.google.com/icons?icon.query=text
 
 Виды input:
+	type="fio"					- ФИО
 	type="tel" 					- телефон
 	type="tel-novalidate" 	- телефон
 	type="password"			- пароль
-	type="text"					- текст
+	type="email"				- e-mail
  -->
 <template>
 	<q-input
-		:type="type"
+		:type="inputData.type"
 		:label="inputData.label"
 		:mask="inputData.mask"
 		unmasked-value
@@ -23,12 +24,13 @@
 </template>
 
 <script>
+import { checkFio, checkEmail, checkPassword, checkPhone } from '../Helpers/CheckData.js'
 
 export default {
 	props: {
 		type: {
 			validator(value) {
-				return ['tel', 'password', 'text'].includes(value)
+				return ['tel', 'password', 'email', 'fio'].includes(value)
 			}
 		},
 		label: {
@@ -43,14 +45,28 @@ export default {
 		// check tel
 		const isValidPhone = (phone) => new Promise((resolve) => {
 			setTimeout(() => {
-				resolve(phone.length === 10 || 'Введите корректный номер')
+				resolve(checkPhone(phone) || 'Введите корректный номер')
 			}, 1000)
 		})
 
 		// check password
 		const isValidPassword = (password) => new Promise((resolve) => {
 			setTimeout(() => {
-				resolve(password.length > 5 || 'Введен короткий пароль')
+				resolve(checkPassword(password) || 'Введен короткий пароль')
+			}, 1000)
+		})
+
+		// check email
+		const isValidEmail = (email) => new Promise((resolve) => {
+			setTimeout(() => {
+				resolve(checkEmail(email) || 'Введите корректный e-mail')
+			}, 1000)
+		})
+
+		// check fio
+		const isValidFio = (fio) => new Promise((resolve) => {
+			setTimeout(() => {
+				resolve(checkFio(fio) || 'Введите ваше имя')
 			}, 1000)
 		})
 
@@ -61,6 +77,7 @@ export default {
 		switch (props.type) {
 			// tel
 			case 'tel': Object.assign(inputData, {
+				type: 'tel',
 				mask: '+7 (###) ###-##-##',
 				icon: 'phone',
 				maxlength: 0,
@@ -69,19 +86,30 @@ export default {
 				break
 			// password
 			case 'password': Object.assign(inputData, {
+				type: 'password',
 				mask: '',
 				icon: 'lock',
 				maxlength: 32,
 				rules: [isValidPassword]
 			})
 				break
-			// text
+			// email
+			case 'email': Object.assign(inputData, {
+				type: 'email',
+				mask: '',
+				icon: 'alternate_email',
+				maxlength: 128,
+				rules: [isValidEmail]
+			})
+				break
+			// fio
 			default: {
 				Object.assign(inputData, {
+					type: 'text',
 					mask: '',
-					icon: 'format_quote',
+					icon: 'face',
 					maxlength: 32,
-					rules: []
+					rules: [isValidFio]
 				})
 			}
 		}
