@@ -6,34 +6,12 @@
       </q-card-section>
 
       <div class="q-card rounded-borders rounded-xl whitespace-pre-line">
-        <q-card-section class="space-y-2">
-          <q-form class="space-y-2" @submit="submitForm">
-            <!-- В форму ввода телефона добавить mask="+7(###)###-##-##" unmasked-value -->
-            <q-input
-              type="tel"
-              v-model="formData.phone"
-              label="номер телефона"
-              mask="+7 (###) ###-##-##"
-              unmasked-value
-              outlined
-              :rules="[isPhoneValid]"
-            >
-              <template v-slot:prepend>
-                <q-icon name="phone" />
-              </template>
-            </q-input>
-            <q-input
-              v-model="formData.password"
-              label="пароль"
-              type="password"
-              outlined
-              :rules="[isPasswordValid]"
-              maxlength="32"
-            >
-              <template v-slot:prepend>
-                <q-icon name="lock" class="block" />
-              </template>
-            </q-input>
+        <q-card-section>
+          <q-form class="p-4 space-y-4" @submit="submitForm">
+            <quasar-input type="tel" v-model="formData.phone" label="номер телефона" />
+            <quasar-input type="password" v-model="formData.password" label="пароль" />
+
+            <div class="mb-4"></div>
             <q-btn
               class="full-width bg-primary text-white"
               type="submit"
@@ -49,9 +27,12 @@
 
 <script>
 import { defineComponent, reactive, computed } from 'vue'
+import QuasarInput from '../components/UI/QuasarInput.vue';
 
 export default defineComponent({
   name: 'PageIndex',
+
+  components: { QuasarInput },
 
   // setup(props, { attrs, slots, emit, expose }) {
   setup() {
@@ -62,18 +43,7 @@ export default defineComponent({
 
     const isFormValid = computed(() => formData.phone.length === 10 && formData.password.length > 5)
 
-    const isPhoneValid = (phone) => new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(phone.length === 10 || 'Введите корректный номер')
-      }, 1000)
-    })
-    const isPasswordValid = (pass) => new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(pass.length > 5 || 'Введен короткий пароль')
-      }, 1000)
-    })
-
-    return { formData, isPhoneValid, isPasswordValid, isFormValid }
+    return { formData, isFormValid }
   },
 
   methods: {
