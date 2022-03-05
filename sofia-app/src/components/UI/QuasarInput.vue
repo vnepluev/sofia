@@ -114,7 +114,7 @@ export default {
 			}
 		}
 
-		return { isValidPhone, isValidPassword, inputData }
+		return { inputData }
 	}
 }
 </script>

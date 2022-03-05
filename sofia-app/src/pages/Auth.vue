@@ -1,4 +1,22 @@
 <template>
+  <!-- сообщение об ошибке -->
+  <q-dialog v-model="isError" persistent transition-show="scale" transition-hide="scale">
+    <q-card class="bg-red text-white" style="width: 300px">
+      <q-card-section>
+        <div class="text-h6">Сервер вернул ошибку!</div>
+      </q-card-section>
+
+      <q-card-section
+        class="q-pt-none"
+      >Пожалуйста проверьте правильность ввода логина и пароля, либо попробуйте войти позднее.</q-card-section>
+
+      <q-card-actions align="right" class="bg-white text-teal">
+        <q-btn flat label="OK" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+  <!-- /сообщение об ошибке -->
+
   <q-page class="flex flex-center">
     <div class="p-4 space-y-4">
       <q-card-section class="bg-primary text-white rounded-borders rounded-xl">
@@ -8,7 +26,7 @@
       <div class="q-card rounded-borders rounded-xl whitespace-pre-line">
         <q-card-section>
           <q-form class="p-4 space-y-4" @submit="submitForm">
-            <quasar-input type="tel" v-model="formData.phone" label="номер телефона" />
+            <quasar-input type="tel" v-model="formData.identifier" label="номер телефона" />
             <quasar-input type="password" v-model="formData.password" label="пароль" />
 
             <div class="mb-4"></div>
@@ -26,8 +44,9 @@
 </template>
 
 <script>
-import { defineComponent, reactive, computed } from 'vue'
-import QuasarInput from '../components/UI/QuasarInput.vue';
+import { defineComponent, reactive, ref, computed } from 'vue'
+import { mapActions } from 'vuex';
+import QuasarInput from '../components/UI/QuasarInput.vue'
 
 export default defineComponent({
   name: 'PageIndex',
@@ -37,19 +56,25 @@ export default defineComponent({
   // setup(props, { attrs, slots, emit, expose }) {
   setup() {
     const formData = reactive({
-      phone: '',
-      password: ''
+      identifier: '9050224000',
+      password: '123456',
     })
 
-    const isFormValid = computed(() => formData.phone.length === 10 && formData.password.length > 5)
+    const isFormValid = computed(() => formData.identifier.length === 10 && formData.password.length > 5)
+    const isError = ref(false)
 
-    return { formData, isFormValid }
+    return { formData, isFormValid, isError }
   },
 
   methods: {
-    submitForm() {
-      // длинна телефона 10 символов без +7
-      return false
+    ...mapActions('auth', ['doLoginAction']),
+    async submitForm() {
+      // логинимся на сервер
+      try {
+        await this.doLoginAction(this.formData)
+      } catch (error) {
+        this.isError = true
+      }
     }
   }
 });
