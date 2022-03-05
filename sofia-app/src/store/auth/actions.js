@@ -15,6 +15,19 @@ export const doLoginAction = async ({ commit }, payload) => {
   })
 }
 
-// export const signOut = ({ commit }) => {}
+export const init = async ({ commit }) => {
+  //
+  const token = localStorage.getItem('token')
+  if (token) {
+    await commit('setToken', JSON.parse(token))
+  } else {
+    commit('removeToken')
+  }
+}
+
+export const signOut = ({ commit }) => {
+  api.defaults.headers.common.Authorization = ''
+  commit('removeToken')
+}
 
 // export const getMe = async ({ commit, dispatch }, token) => {}

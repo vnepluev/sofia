@@ -1,7 +1,5 @@
-export default function () {
-  return {
-    token: '',
-    isAuth: false,
-    me: {},
-  }
+export default {
+  token: '',
+  isAuth: false,
+  me: {},
 }

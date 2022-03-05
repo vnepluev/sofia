@@ -72,12 +72,13 @@ export default defineComponent({
       // логинимся на сервер
       try {
         await this.doLoginAction(this.formData)
+        this.$router.push('/auth') // входим в систему
       } catch (error) {
         this.isError = true
       }
     }
   }
-});
+})
 </script>
 
 <style lang="scss">

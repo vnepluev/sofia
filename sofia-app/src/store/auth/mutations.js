@@ -1,6 +1,7 @@
 export const setToken = (state, token) => {
   state.token = token
   state.isAuth = true
+  localStorage.setItem('token', JSON.stringify(token))
 }
 
 export const removeToken = (state) => {
