@@ -26,9 +26,8 @@ export default route(({ store }) => {
     ),
   })
 
+  // проверка доступа к авторизованной зоне
   Router.beforeEach((to, from, next) => {
-    // проверка доступа к авторизованной зоне
-
     const auth = store.getters['auth/isAuth']
     if (to.matched.some((record) => record.meta.auth) && !auth) {
       next({

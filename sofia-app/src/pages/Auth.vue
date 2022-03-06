@@ -45,7 +45,7 @@
 
 <script>
 import { defineComponent, reactive, ref, computed } from 'vue'
-import { mapActions } from 'vuex';
+import { mapActions } from 'vuex'
 import QuasarInput from '../components/UI/QuasarInput.vue'
 
 export default defineComponent({

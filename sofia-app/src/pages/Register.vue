@@ -42,12 +42,14 @@
 
             <div class="mb-4"></div>
             <q-checkbox
+              class="text-right"
               left-label
               v-model="formData.agree"
               label="Согласие на обработку персональных данных"
               checked-icon="task_alt"
               unchecked-icon="highlight_off"
             />
+            <q-space />
 
             <q-btn
               class="full-width bg-teal text-white"
@@ -67,6 +69,7 @@
 import { defineComponent, reactive, computed } from 'vue'
 import QuasarInput from '../components/UI/QuasarInput.vue'
 import { checkFio, checkEmail, checkPassword, checkPhone } from '../components/Helpers/CheckData.js'
+import { mapActions } from 'vuex'
 
 export default defineComponent({
   name: 'PageIndex',
@@ -99,9 +102,16 @@ export default defineComponent({
   },
 
   methods: {
-    submitForm() {
-      // отправляем данные формы на сервер
-      return false
+    // отправляем данные формы на сервер
+    ...mapActions('auth', ['registerNewUserAction']),
+    async submitForm() {
+      // логинимся на сервер
+      try {
+        await this.registerNewUserAction(this.formData)
+        this.$router.push('/auth') // входим в систему
+      } catch (error) {
+        this.isError = true
+      }
     }
   }
 });

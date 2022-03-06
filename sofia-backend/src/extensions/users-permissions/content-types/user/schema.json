@@ -63,11 +63,6 @@
       "inversedBy": "users",
       "configurable": false
     },
-    "phone1": {
-      "type": "string",
-      "minLength": 5,
-      "maxLength": 18
-    },
     "phone2": {
       "type": "string",
       "maxLength": 18,
@@ -96,6 +91,12 @@
       "relation": "oneToMany",
       "target": "api::order.order",
       "mappedBy": "user_id"
+    },
+    "fio": {
+      "type": "string",
+      "required": true,
+      "maxLength": 32,
+      "minLength": 2
     }
   }
 }
