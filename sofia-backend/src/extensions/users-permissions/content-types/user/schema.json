@@ -65,8 +65,10 @@
     },
     "phone2": {
       "type": "string",
-      "maxLength": 18,
-      "minLength": 5
+      "required": false,
+      "maxLength": 10,
+      "minLength": 10,
+      "regex": "[0-9]"
     },
     "telegram_id": {
       "type": "biginteger"
@@ -84,7 +86,7 @@
     "group": {
       "type": "string",
       "default": "user",
-      "required": true
+      "required": false
     },
     "orders": {
       "type": "relation",
@@ -94,9 +96,14 @@
     },
     "fio": {
       "type": "string",
-      "required": true,
+      "required": false,
       "maxLength": 32,
       "minLength": 2
+    },
+    "agree": {
+      "type": "boolean",
+      "default": false,
+      "required": false
     }
   }
 }

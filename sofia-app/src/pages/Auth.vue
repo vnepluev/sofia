@@ -1,21 +1,10 @@
 <template>
   <!-- сообщение об ошибке -->
-  <q-dialog v-model="isError" persistent transition-show="scale" transition-hide="scale">
-    <q-card class="bg-red text-white" style="width: 300px">
-      <q-card-section>
-        <div class="text-h6">Сервер вернул ошибку!</div>
-      </q-card-section>
-
-      <q-card-section
-        class="q-pt-none"
-      >Пожалуйста проверьте правильность ввода логина и пароля, либо попробуйте войти позднее.</q-card-section>
-
-      <q-card-actions align="right" class="bg-white text-teal">
-        <q-btn flat label="OK" v-close-popup />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-  <!-- /сообщение об ошибке -->
+  <quasar-alert
+    v-model="isError"
+    title="Сервер вернул ошибку!"
+    text="Пожалуйста проверьте правильность ввода логина и пароля, либо попробуйте войти позднее."
+  ></quasar-alert>
 
   <q-page class="flex flex-center">
     <div class="p-4 space-y-4">
@@ -46,12 +35,13 @@
 <script>
 import { defineComponent, reactive, ref, computed } from 'vue'
 import { mapActions } from 'vuex'
+import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 import QuasarInput from '../components/UI/QuasarInput.vue'
 
 export default defineComponent({
   name: 'PageIndex',
 
-  components: { QuasarInput },
+  components: { QuasarInput, QuasarAlert },
 
   // setup(props, { attrs, slots, emit, expose }) {
   setup() {

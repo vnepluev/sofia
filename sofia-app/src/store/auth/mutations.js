@@ -7,6 +7,7 @@ export const setToken = (state, token) => {
 export const removeToken = (state) => {
   state.token = ''
   state.isAuth = false
+  localStorage.removeItem('token')
 }
 
 // после входа в систему, сервер возвращает все данные о пользователе

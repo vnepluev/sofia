@@ -17,12 +17,13 @@ export const doLoginAction = async ({ commit }, payload) => {
 
 // регистрируем пользователя в системе, получаем JWT token и входим в систему
 // код пишем тут
-export const registerNewUserAction = async ({ commit }, payload) => {
-  await api.post('/auth/local', payload).then((response) => {
+export const registerNewUserAction = async ({ commit }, userData) => {
+  delete userData.confirmPassword
+  await api.post('/auth/local/register', userData).then((response) => {
     console.log(response.data)
     // проверяем правильность пароля
     if (!response.data.code === 200) {
-      throw new Error('Введите корректный логин/пароль')
+      throw new Error('Ошибка при регистрации нового пользователя')
     }
     const token = response.data.jwt
     commit('setToken', token) // mutations token
