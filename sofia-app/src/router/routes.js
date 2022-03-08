@@ -6,7 +6,7 @@ const routes = [
       {
         name: 'LoginIn',
         path: '',
-        component: () => import('src/pages/Auth.vue'),
+        component: () => import('src/pages/auth/Index.vue'),
       },
       { path: '/register', component: () => import('pages/Register.vue') },
     ],
@@ -18,16 +18,21 @@ const routes = [
     path: '/auth',
     component: () => import('layouts/ClientAreaLayout.vue'),
     children: [
-      { path: '', component: () => import('src/pages/Auth.vue') },
-      { path: '/admin', component: () => import('pages/admin/Index') },
+      { path: '', component: () => import('src/pages/auth/news/Index.vue') },
+      {
+        path: '/auth/orders',
+        component: () => import('src/pages/auth/orders/Index.vue'),
+      },
+      {
+        path: '/auth/options',
+        component: () => import('src/pages/auth/options/Index.vue'),
+      },
     ],
     meta: {
       auth: true,
     },
   },
 
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue'),

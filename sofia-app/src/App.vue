@@ -16,5 +16,5 @@ export default defineComponent({
       api.defaults.headers.common.Authorization = ''
     }
   }
-});
+})
 </script>

@@ -36,7 +36,7 @@
 import { defineComponent, reactive, ref, computed } from 'vue'
 import { mapActions } from 'vuex'
 import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
-import QuasarInput from '../components/UI/QuasarInput.vue'
+import QuasarInput from '../../components/UI/QuasarInput.vue'
 
 export default defineComponent({
   name: 'PageIndex',
