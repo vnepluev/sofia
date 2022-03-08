@@ -119,6 +119,10 @@ export default defineComponent({
       try {
         const prepareFormData = { ...this.formData }
         delete prepareFormData.confirmPassword
+        // ** ФИО первая буква заглавная, остальные строчные
+        // ** после пробела первая буква заглавная - остальные строчные
+        // prepareFormData.fio = prepareFormData.fio[0].toUpperCase()
+        // + prepareFormData.fio.split('').splice(1).join('')
         await this.$store.dispatch('auth/registerNewUserAction', prepareFormData)
         this.$router.push('/auth') // входим в систему после регистрации
       } catch (error) {

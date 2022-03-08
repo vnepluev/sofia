@@ -31,14 +31,13 @@ import { ref } from 'vue'
 export default {
   name: 'LayoutLogin',
   // если пользователь вошел в систему и пытается зайти на главную
-  // preFetch({ store, redirect }) {
-  //   if (store.state.isAuth) {
-  //     console.log('сработало');
-  //     redirect({ path: '/auth/news' })
-  //     return false
-  //   }
-  //   return true
-  // },
+  preFetch({ store, redirect }) {
+    if (store.getters['auth/isAuth']) {
+      return redirect({ path: '/auth' })
+    }
+    return true
+  },
+
   setup() {
     const leftDrawerOpen = ref(false)
 
