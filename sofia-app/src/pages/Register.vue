@@ -78,6 +78,7 @@
 
 <script>
 import { defineComponent, ref, reactive, computed } from 'vue'
+import { formatFio } from 'src/components/Helpers/FormatData.js'
 import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 import QuasarInput from '../components/UI/QuasarInput.vue'
 import { checkFio, checkEmail, checkPassword, checkPhone } from '../components/Helpers/CheckData.js'
@@ -119,10 +120,8 @@ export default defineComponent({
       try {
         const prepareFormData = { ...this.formData }
         delete prepareFormData.confirmPassword
-        // ** ФИО первая буква заглавная, остальные строчные
-        // ** после пробела первая буква заглавная - остальные строчные
-        // prepareFormData.fio = prepareFormData.fio[0].toUpperCase()
-        // + prepareFormData.fio.split('').splice(1).join('')
+        // ФИО первая буква заглавная, остальные строчные
+        prepareFormData.fio = formatFio(this.formData.fio)
         await this.$store.dispatch('auth/registerNewUserAction', prepareFormData)
         this.$router.push('/auth') // входим в систему после регистрации
       } catch (error) {

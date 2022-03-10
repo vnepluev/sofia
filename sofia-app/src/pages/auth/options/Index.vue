@@ -32,7 +32,7 @@
 									class="full-width bg-teal text-white"
 									type="submit"
 									label="Изменить"
-									:disable="!isFormValid"
+									:disable="!isPasswordValid"
 								></q-btn>
 							</q-form>
 						</q-card-section>
@@ -56,16 +56,16 @@
 								/>
 								<quasar-input
 									type="tel"
-									v-model="formData.username"
+									v-model="formData.phone2"
 									label="резервный номер телефона"
-									class="pt-6"
+									class="pt-4"
 								/>
 								<div class="space-y-2"></div>
 								<q-btn
 									class="full-width bg-teal text-white"
 									type="submit"
 									label="Изменить"
-									:disable="!isFormValid"
+									:disable="!isDataValid"
 								></q-btn>
 							</q-form>
 						</q-card-section>
@@ -85,7 +85,7 @@
 								class="text-primary"
 								href="https://telegram.me/yacht_sofia_bot"
 								target="_blank"
-							>@yacht_sofia_bot</a> запустите его в Телеграм и нажмите "Регистрация".
+							>@yacht_sofia_bot</a> запустите его в приложении Telegram и нажмите кнопку "Регистрация".
 							<br />
 							<br />После сообщения "Бот успешно подключен", вам будут доступны дополнительные опции.
 						</q-card-section>
@@ -98,24 +98,28 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive } from 'vue'
+import { defineComponent, ref, reactive, computed } from 'vue'
 import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 import QuasarInput from 'src/components/UI/QuasarInput.vue'
-// import { checkFio, checkEmail, checkPassword, checkPhone } from 'src/components/Helpers/CheckData.js'
+import { checkPassword, checkPhone, checkFio } from 'src/components/Helpers/CheckData.js'
 
 export default defineComponent({
 	setup() {
 		const isError = ref(false)
 		const formData = reactive({
 			fio: 'test',
-			username: '9050224000',
+			phone2: '9050224000',
 			password: '123456',
 			confirmPassword: '123456',
 			email: '1@mail.ru',
 			agree: false
 		})
 
-		return { isError, formData }
+		// проверка введенных данных
+		const isPasswordValid = computed(() => formData.password === formData.confirmPassword && checkPassword(formData.password))
+		const isDataValid = computed(() => checkPhone(formData.phone2) && checkFio(formData.fio))
+
+		return { isError, formData, isPasswordValid, isDataValid }
 	},
 	components: { QuasarAlert, QuasarInput }
 })
