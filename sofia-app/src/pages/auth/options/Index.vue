@@ -1,3 +1,7 @@
+<!--
+	https://quasar.dev/vue-components/tab-panels
+	https://quasar.dev/vue-components/expansion-item
+-->
 <template>
 	<quasar-alert
 		v-model="isError"
@@ -5,62 +9,92 @@
 		text="Возможно пользователь с текущим номером телефона зарегистрирован. Возможно проблемы на сервере. Попробуйте позднее."
 	></quasar-alert>
 
+	<!-- ext item -->
 	<q-page class="flex flex-center">
-		<div class="p-4 space-y-4">
-			<div class="q-card rounded-borders rounded-xl whitespace-pre-line">
-				<q-card-section>
-					<q-form class="p-4 space-y-4" @submit="submitForm">
-						<!-- form data -->
+		<div class="q-pa-md" style="width: 320px;">
+			<q-card-section class="mb-2 bg-primary text-white rounded-borders rounded-xl">
+				<div class="text-h6 p-2">Настройки</div>
+			</q-card-section>
 
-						<q-input
-							outlined
-							bottom-slots
-							v-model="text"
-							label="Label"
-							counter
-							maxlength="12"
-							:dense="dense"
-						>
-							<template v-slot:before>
-								<q-avatar>
-									<img src="https://cdn.quasar.dev/img/avatar5.jpg" />
-								</q-avatar>
-							</template>
+			<q-list bordered class="rounded-borders">
+				<q-expansion-item
+					switch-toggle-side
+					expand-separator
+					icon="verified_user"
+					label="Изменить пароль"
+				>
+					<q-card>
+						<q-card-section>
+							<q-form class="p-4 pt-2 space-y-4">
+								<quasar-input type="password" v-model="formData.password" label="пароль" />
+								<quasar-input type="password" v-model="formData.confirmPassword" label="пароль повторно" />
+								<q-btn
+									class="full-width bg-teal text-white"
+									type="submit"
+									label="Изменить"
+									:disable="!isFormValid"
+								></q-btn>
+							</q-form>
+						</q-card-section>
+					</q-card>
+				</q-expansion-item>
 
-							<template v-slot:append>
-								<q-icon v-if="text !== ''" name="close" @click="text = ''" class="cursor-pointer" />
-								<q-icon name="schedule" />
-							</template>
+				<q-expansion-item
+					switch-toggle-side
+					expand-separator
+					icon="account_box"
+					label="Контактные данные"
+				>
+					<q-card>
+						<q-card-section>
+							<q-form class="p-2">
+								<quasar-input
+									type="fio"
+									v-model="formData.fio"
+									label="ваше имя"
+									hint="н-р: Анна Николаевна"
+								/>
+								<quasar-input
+									type="tel"
+									v-model="formData.username"
+									label="резервный номер телефона"
+									class="pt-6"
+								/>
+								<div class="space-y-2"></div>
+								<q-btn
+									class="full-width bg-teal text-white"
+									type="submit"
+									label="Изменить"
+									:disable="!isFormValid"
+								></q-btn>
+							</q-form>
+						</q-card-section>
+					</q-card>
+				</q-expansion-item>
 
-							<template v-slot:hint>Field hint</template>
-
-							<template v-slot:after>
-								<q-btn round dense flat icon="send" />
-							</template>
-						</q-input>
-
-						<quasar-input type="fio" v-model="formData.fio" label="ваше имя" hint="н-р: Анна Николаевна" />
-						<quasar-input type="tel" v-model="formData.username" label="номер телефона" class="pt-4" />
-						<quasar-input type="email" v-model="formData.email" label="e-mail адрес" />
-
-						<quasar-input type="password" v-model="formData.password" label="пароль" />
-						<quasar-input type="password" v-model="formData.confirmPassword" label="пароль повторно" />
-
-						<div class="mb-4"></div>
-						<q-space />
-
-						<q-btn
-							class="full-width bg-teal text-white"
-							type="submit"
-							label="Зарегистрироваться"
-							:disable="!isFormValid"
-						></q-btn>
-						<!-- /form data -->
-					</q-form>
-				</q-card-section>
-			</div>
+				<q-expansion-item
+					switch-toggle-side
+					expand-separator
+					icon="circle_notifications"
+					label="Telegram bot"
+				>
+					<q-card>
+						<q-card-section>
+							Для подключения
+							<a
+								class="text-primary"
+								href="https://telegram.me/yacht_sofia_bot"
+								target="_blank"
+							>@yacht_sofia_bot</a> запустите его в Телеграм и нажмите "Регистрация".
+							<br />
+							<br />После сообщения "Бот успешно подключен", вам будут доступны дополнительные опции.
+						</q-card-section>
+					</q-card>
+				</q-expansion-item>
+			</q-list>
 		</div>
 	</q-page>
+	<!-- /ext item -->
 </template>
 
 <script>
@@ -88,4 +122,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.q-card__section--vert {
+	padding: 0 16px 6px 16px;
+}
 </style>
