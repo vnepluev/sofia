@@ -43,6 +43,25 @@
     },
     "promocode": {
       "type": "string"
+    },
+    "sert_number": {
+      "type": "string"
+    },
+    "sert_booking_code": {
+      "type": "integer"
+    },
+    "sert_done_code": {
+      "type": "integer"
+    },
+    "sert_activated": {
+      "type": "boolean"
+    },
+    "pay_done": {
+      "type": "boolean",
+      "default": false
+    },
+    "order_id": {
+      "type": "uid"
     }
   }
 }

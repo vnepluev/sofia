@@ -12,7 +12,7 @@
 	<!-- ext item -->
 	<q-page class="flex flex-center">
 		<div class="q-pa-md" style="width: 320px;">
-			<q-card-section class="mb-2 bg-primary text-white rounded-borders rounded-xl">
+			<q-card-section class="mb-2 glossy bg-primary text-white rounded-borders rounded-xl">
 				<div class="text-h6 p-2">Настройки</div>
 			</q-card-section>
 
@@ -47,7 +47,7 @@
 				>
 					<q-card>
 						<q-card-section>
-							<q-form class="p-2">
+							<q-form class="p-2 pt-0">
 								<quasar-input
 									type="fio"
 									v-model="formData.fio"
@@ -60,7 +60,7 @@
 									label="резервный номер телефона"
 									class="pt-4"
 								/>
-								<div class="space-y-2"></div>
+								<div class="mt-4"></div>
 								<q-btn
 									class="full-width bg-teal text-white"
 									type="submit"
@@ -112,7 +112,6 @@ export default defineComponent({
 			password: '123456',
 			confirmPassword: '123456',
 			email: '1@mail.ru',
-			agree: false
 		})
 
 		// проверка введенных данных

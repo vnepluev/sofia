@@ -63,7 +63,7 @@
             <q-space />
 
             <q-btn
-              class="full-width bg-teal text-white"
+              class="full-width bg-teal text-white glossy"
               type="submit"
               label="Зарегистрироваться"
               :disable="!isFormValid"

@@ -8,7 +8,7 @@
 
   <q-page class="flex flex-center">
     <div class="p-4 space-y-4">
-      <q-card-section class="bg-primary text-white rounded-borders rounded-xl">
+      <q-card-section class="glossy bg-primary text-white rounded-borders rounded-xl">
         <div class="text-h6">Вход в систему</div>
       </q-card-section>
 
@@ -20,7 +20,7 @@
 
             <div class="mb-4"></div>
             <q-btn
-              class="full-width bg-primary text-white"
+              class="glossy full-width bg-primary text-white"
               type="submit"
               label="Войти"
               :disable="!isFormValid"

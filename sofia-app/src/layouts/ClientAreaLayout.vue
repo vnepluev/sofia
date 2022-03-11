@@ -15,11 +15,12 @@
     </q-header>
     <!-- выпадающее меню -->
     <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
-      <q-btn stretch flat class="text-primary" to="/auth" v-if="isAuth">Новости</q-btn>
-      <q-btn stretch flat class="text-primary" to="/auth/orders" v-if="isAuth">Мои заказы</q-btn>
-      <q-btn stretch flat class="text-primary" to="/auth/options" v-if="isAuth">Настройки</q-btn>
-      <q-btn stretch flat class="text-primary" to="/" v-if="!isAuth">Войти</q-btn>
-      <q-btn stretch flat class="text-primary" @click="logout" v-else>Выйти</q-btn>
+      <div class="mt-10"></div>
+      <q-btn stretch flat class="text-primary w-full" to="/auth" v-if="isAuth">Новости</q-btn>
+      <q-btn stretch flat class="text-primary w-full" to="/auth/orders" v-if="isAuth">Мои заказы</q-btn>
+      <q-btn stretch flat class="text-primary w-full" to="/auth/options" v-if="isAuth">Настройки</q-btn>
+      <q-btn stretch flat class="text-primary w-full" to="/" v-if="!isAuth">Войти</q-btn>
+      <q-btn stretch flat class="text-primary w-full" @click="logout" v-else>Выйти</q-btn>
     </q-drawer>
 
     <q-page-container>
