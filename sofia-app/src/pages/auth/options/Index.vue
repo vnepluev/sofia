@@ -15,7 +15,7 @@
 			<q-card-section class="mb-2 glossy bg-primary text-white rounded-borders rounded-xl">
 				<div class="text-h6 p-2">Настройки</div>
 			</q-card-section>
-
+			{{ formData }}
 			<q-list bordered class="rounded-borders">
 				<q-expansion-item
 					switch-toggle-side
@@ -26,8 +26,8 @@
 					<q-card>
 						<q-card-section>
 							<q-form class="p-4 pt-2 space-y-4">
-								<quasar-input type="password" v-model="formData.password" label="пароль" />
-								<quasar-input type="password" v-model="formData.confirmPassword" label="пароль повторно" />
+								<quasar-input type="password" v-model="password.pass1" label="пароль" />
+								<quasar-input type="password" v-model="password.pass2" label="пароль повторно" />
 								<q-btn
 									class="full-width bg-teal text-white"
 									type="submit"
@@ -66,6 +66,7 @@
 									type="submit"
 									label="Изменить"
 									:disable="!isDataValid"
+									@click="handleChangePhone"
 								></q-btn>
 							</q-form>
 						</q-card-section>
@@ -99,6 +100,7 @@
 
 <script>
 import { defineComponent, ref, reactive, computed } from 'vue'
+import { useStore } from 'vuex'
 import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 import QuasarInput from 'src/components/UI/QuasarInput.vue'
 import { checkPassword, checkPhone, checkFio } from 'src/components/Helpers/CheckData.js'
@@ -106,19 +108,35 @@ import { checkPassword, checkPhone, checkFio } from 'src/components/Helpers/Chec
 export default defineComponent({
 	setup() {
 		const isError = ref(false)
+		// const formData = reactive({
+		// 	fio: 'test',
+		// 	phone2: '9050224000',
+		// 	password: '123456',
+		// 	confirmPassword: '123456',
+		// 	email: '1@mail.ru',
+		// })
+
+		const $store = useStore()
+		const getMe = computed(() => $store.getters['auth/getMe']) // получаем информацию о пользователе
+
 		const formData = reactive({
-			fio: 'test',
-			phone2: '9050224000',
-			password: '123456',
-			confirmPassword: '123456',
-			email: '1@mail.ru',
+			...getMe.value,
+		})
+		const password = reactive({
+			pass1: '',
+			pass2: ''
 		})
 
 		// проверка введенных данных
-		const isPasswordValid = computed(() => formData.password === formData.confirmPassword && checkPassword(formData.password))
+		const isPasswordValid = computed(() => password.pass1.value === password.pass2.value && checkPassword(password.pass1.value))
 		const isDataValid = computed(() => checkPhone(formData.phone2) && checkFio(formData.fio))
 
-		return { isError, formData, isPasswordValid, isDataValid }
+		// нажали изменить имя и телефон
+		const handleChangePhone = () => {
+
+		}
+
+		return { isError, formData, password, isPasswordValid, isDataValid, handleChangePhone }
 	},
 	components: { QuasarAlert, QuasarInput }
 })

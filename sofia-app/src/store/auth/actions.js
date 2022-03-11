@@ -20,7 +20,6 @@ export const doLoginAction = async ({ commit }, payload) => {
 export const registerNewUserAction = async ({ commit }, userData) => {
   delete userData.confirmPassword
   await api.post('/auth/local/register', userData).then((response) => {
-    console.log(response.data)
     // проверяем правильность пароля
     if (!response.data.code === 200) {
       throw new Error('Ошибка при регистрации нового пользователя')

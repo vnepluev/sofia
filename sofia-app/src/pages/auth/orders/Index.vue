@@ -5,7 +5,7 @@
 			<q-markup-table separator="vertical" flat bordered>
 				<thead class="bg-teal glossy">
 					<tr>
-						<th colspan="6">
+						<th colspan="4">
 							<div class="row no-wrap items-center">
 								<div class="text-h4 q-ml-md text-white">Мои заказы</div>
 							</div>
@@ -16,8 +16,6 @@
 						<th class="text-right">Начало</th>
 						<th class="text-right">Завершение</th>
 						<th class="text-right">Пассажиров</th>
-						<th class="text-right">Protein (g)</th>
-						<th class="text-right">Protein (g)</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -25,25 +23,19 @@
 						<td class="text-left">Яхта "София"</td>
 						<td class="text-right">10:00</td>
 						<td class="text-right">12:00</td>
-						<td class="text-right">24</td>
 						<td class="text-right">4</td>
-						<td class="text-right">87</td>
 					</tr>
 					<tr class="hover-item">
-						<td class="text-left">Ice cream sandwich</td>
-						<td class="text-right">237</td>
-						<td class="text-right">9</td>
-						<td class="text-right">37</td>
-						<td class="text-right">4.3</td>
-						<td class="text-right">129</td>
+						<td class="text-left">Яхта "София"</td>
+						<td class="text-right">14:00</td>
+						<td class="text-right">15:30</td>
+						<td class="text-right">3</td>
 					</tr>
 					<tr>
-						<td class="text-left">Eclair</td>
-						<td class="text-right">262</td>
-						<td class="text-right">16</td>
-						<td class="text-right">23</td>
-						<td class="text-right">6</td>
-						<td class="text-right">337</td>
+						<td class="text-left">Яхта "София"</td>
+						<td class="text-right">17:30</td>
+						<td class="text-right">19:30</td>
+						<td class="text-right">2</td>
 					</tr>
 				</tbody>
 			</q-markup-table>
