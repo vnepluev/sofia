@@ -26,8 +26,9 @@
 					<q-card>
 						<q-card-section>
 							<q-form class="p-4 pt-2 space-y-4">
-								<quasar-input type="password" v-model="password.pass1" label="пароль" />
-								<quasar-input type="password" v-model="password.pass2" label="пароль повторно" />
+								<quasar-input type="password" v-model="password.currentPass" label="текущий пароль" />
+								<quasar-input type="password" v-model="password.pass1" label="новый пароль" />
+								<quasar-input type="password" v-model="password.pass2" label="новый пароль повторно" />
 								<q-btn
 									class="full-width bg-teal text-white"
 									type="submit"
@@ -123,6 +124,7 @@ export default defineComponent({
 			...getMe.value,
 		})
 		const password = reactive({
+			currentPass: '',
 			pass1: '',
 			pass2: ''
 		})
