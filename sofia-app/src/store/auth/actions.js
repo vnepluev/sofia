@@ -1,33 +1,35 @@
 import { api } from 'src/boot/axios'
 
-// логинимся на сервер и получаем jwt token, если ок
+/**
+ * Устанавливаем новый токен
+ */
+const setToken = (response, commit) => {
+  // проверяем правильность пароля
+  if (!response.data.code === 200) {
+    throw new Error()
+  }
+  const token = response.data.jwt
+  commit('setToken', token) // mutations token
+  commit('setMe', response.data.user) // save user info
+  api.defaults.headers.common.Authorization = `Bearer ${token}`
+}
+
+/**
+ * логинимся на сервер (вход в систему)
+ */
 export const doLoginAction = async ({ commit }, payload) => {
   await api.post('/auth/local', payload).then((response) => {
-    // console.log(response.data)
-    // проверяем правильность пароля
-    if (!response.data.code === 200) {
-      throw new Error('Введите корректный логин/пароль')
-    }
-    const token = response.data.jwt
-    commit('setToken', token) // mutations token
-    commit('setMe', response.data.user) // save user info
-    api.defaults.headers.common.Authorization = `Bearer ${token}`
+    setToken(response, commit)
   })
 }
 
-// регистрируем пользователя в системе, получаем JWT token и входим в систему
-// код пишем тут
+/**
+ * регистрация нового пользователя и вход в систему
+ */
 export const registerNewUserAction = async ({ commit }, userData) => {
   delete userData.confirmPassword
   await api.post('/auth/local/register', userData).then((response) => {
-    // проверяем правильность пароля
-    if (!response.data.code === 200) {
-      throw new Error('Ошибка при регистрации нового пользователя')
-    }
-    const token = response.data.jwt
-    commit('setToken', token) // mutations token
-    commit('setMe', response.data.user) // save user info
-    api.defaults.headers.common.Authorization = `Bearer ${token}`
+    setToken(response, commit)
   })
 }
 
@@ -44,6 +46,20 @@ export const init = async ({ commit }) => {
 export const signOut = ({ commit }) => {
   api.defaults.headers.common.Authorization = ''
   commit('removeToken')
+}
+
+/**
+ * смена пароля пользователя
+ */
+export const changePasswordAction = async ({ commit }, newPassword) => {
+  const data = {
+    username: newPassword.username,
+    current_password: newPassword.currentPass,
+    new_password: newPassword.pass1,
+  }
+  await api.put('/change-user', data).then((response) => {
+    setToken(response, commit)
+  })
 }
 
 // export const getMe = async ({ commit, dispatch }, token) => {}

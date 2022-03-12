@@ -5,8 +5,8 @@
 <template>
 	<quasar-alert
 		v-model="isError"
-		title="Ошибка регистрации!"
-		text="Возможно пользователь с текущим номером телефона зарегистрирован. Возможно проблемы на сервере. Попробуйте позднее."
+		title="Ошибка!"
+		text="При изменении данных возникла ошибка на сервере."
 	></quasar-alert>
 
 	<!-- ext item -->
@@ -15,7 +15,6 @@
 			<q-card-section class="mb-2 glossy bg-primary text-white rounded-borders rounded-xl">
 				<div class="text-h6 p-2">Настройки</div>
 			</q-card-section>
-			{{ formData }}
 			<q-list bordered class="rounded-borders">
 				<q-expansion-item
 					switch-toggle-side
@@ -34,6 +33,7 @@
 									type="submit"
 									label="Изменить"
 									:disable="!isPasswordValid"
+									@click="handleChangePassword"
 								></q-btn>
 							</q-form>
 						</q-card-section>
@@ -124,13 +124,20 @@ export default defineComponent({
 			...getMe.value,
 		})
 		const password = reactive({
-			currentPass: '',
-			pass1: '',
-			pass2: ''
+			currentPass: '123456',
+			pass1: '1234567',
+			pass2: '1234567',
+			username: formData.username
 		})
 
 		// проверка введенных данных
-		const isPasswordValid = computed(() => password.pass1.value === password.pass2.value && checkPassword(password.pass1.value))
+		const isPasswordValid = computed(() => {
+			const step1 = password.pass1 === password.pass2
+			const step2 = checkPassword(password.pass1)
+			const step3 = checkPassword(password.currentPass)
+			const step4 = password.currentPass !== password.pass1
+			return !!((step1 && step2 && step3 && step4))
+		})
 		const isDataValid = computed(() => checkPhone(formData.phone2) && checkFio(formData.fio))
 
 		// нажали изменить имя и телефон
@@ -138,7 +145,18 @@ export default defineComponent({
 
 		}
 
-		return { isError, formData, password, isPasswordValid, isDataValid, handleChangePhone }
+		// изменить пароль
+		const handleChangePassword = async () => {
+			try {
+				if (isPasswordValid.value) {
+					await $store.dispatch('auth/changePasswordAction', password)
+				}
+			} catch {
+				isError.value = true
+			}
+		}
+
+		return { isError, formData, password, isPasswordValid, isDataValid, handleChangePhone, handleChangePassword }
 	},
 	components: { QuasarAlert, QuasarInput }
 })
