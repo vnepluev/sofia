@@ -26,10 +26,10 @@
 </template>
 
 <script>
-import { ref } from 'vue'
 
 export default {
   name: 'LayoutLogin',
+
   // если пользователь вошел в систему и пытается зайти на главную
   preFetch({ store, redirect }) {
     if (store.getters['auth/isAuth']) {
@@ -39,14 +39,6 @@ export default {
   },
 
   setup() {
-    const leftDrawerOpen = ref(false)
-
-    return {
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
   }
 }
 </script>

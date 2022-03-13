@@ -1,10 +1,6 @@
 <template>
   <!-- сообщение об ошибке -->
-  <quasar-alert
-    v-model="isError"
-    title="Сервер вернул ошибку!"
-    text="Пожалуйста проверьте правильность ввода логина и пароля, либо попробуйте войти позднее."
-  ></quasar-alert>
+  <quasar-alert v-model="isError" title="Сервер вернул ошибку!" :text="errorMessage"></quasar-alert>
 
   <q-page class="flex flex-center">
     <div class="p-4 space-y-4">
@@ -52,8 +48,9 @@ export default defineComponent({
 
     const isFormValid = computed(() => formData.identifier.length === 10 && formData.password.length > 5)
     const isError = ref(false)
+    const errorMessage = ref('')
 
-    return { formData, isFormValid, isError }
+    return { formData, isFormValid, isError, errorMessage }
   },
 
   methods: {
@@ -65,6 +62,7 @@ export default defineComponent({
         this.$router.push('/auth') // входим в систему
       } catch (error) {
         this.isError = true
+        this.errorMessage = `Пожалуйста, проверьте правильность ввода логина и пароля, либо попробуйте войти позднее.\n\n${error}`
       }
     }
   }
