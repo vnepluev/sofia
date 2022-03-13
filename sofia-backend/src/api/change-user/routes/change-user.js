@@ -9,5 +9,14 @@ module.exports = {
         middlewares: [],
       },
     },
+    {
+      method: "PUT",
+      path: "/change-user-data",
+      handler: "change-user.changeUserData",
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };

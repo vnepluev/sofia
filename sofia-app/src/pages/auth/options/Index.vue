@@ -37,7 +37,7 @@
 									type="submit"
 									label="Изменить"
 									:disable="!isPasswordValid"
-									@click="handleChangePassword"
+									@click.prevent="handleChangePassword"
 								></q-btn>
 							</q-form>
 						</q-card-section>
@@ -71,7 +71,7 @@
 									type="submit"
 									label="Изменить"
 									:disable="!isDataValid"
-									@click="handleChangePhone"
+									@click.prevent="handleChangePhone"
 								></q-btn>
 							</q-form>
 						</q-card-section>
@@ -151,6 +151,7 @@ export default defineComponent({
 			try {
 				if (isDataValid.value) {
 					await $store.dispatch('auth/changeUserDataAction', {
+						username: getMe.value.username,
 						fio: formData.fio,
 						phone2: formData.phone2
 					})

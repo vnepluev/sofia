@@ -14,3 +14,8 @@ export const removeToken = (state) => {
 export const setMe = (state, me) => {
   state.me = me
 }
+
+// если нажали изменить ФИО, phone2
+export const setFioPhone2 = (state, resData) => {
+  Object.assign(state.me, resData.data)
+}

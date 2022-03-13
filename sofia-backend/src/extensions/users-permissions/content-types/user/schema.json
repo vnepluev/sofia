@@ -98,7 +98,8 @@
       "type": "string",
       "required": false,
       "maxLength": 32,
-      "minLength": 2
+      "minLength": 2,
+      "regex": "^[а-я А-Яa-zA-Z]+$"
     },
     "agree": {
       "type": "boolean",
