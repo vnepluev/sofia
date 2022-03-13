@@ -3,11 +3,15 @@
 	https://quasar.dev/vue-components/expansion-item
 -->
 <template>
-	<quasar-alert
-		v-model="isError"
-		title="Ошибка!"
-		text="При изменении данных возникла ошибка на сервере."
-	></quasar-alert>
+	<quasar-alert v-model="isError" title="Ошибка!" :text="errorMessage"></quasar-alert>
+
+	<!--
+		Добавить уведомление, что все ок
+		https://quasar.dev/quasar-plugins/notify
+		<q-btn no-caps unelevated color="positive" @click="triggerPositive" :label="okMessage" />
+	<q-btn round size="sm" color="positive" @click="showNotif('top-right')">
+		<q-icon name="arrow_upward" class="rotate-45" />
+	</q-btn>-->
 
 	<!-- ext item -->
 	<q-page class="flex flex-center">
@@ -109,13 +113,7 @@ import { checkPassword, checkPhone, checkFio } from 'src/components/Helpers/Chec
 export default defineComponent({
 	setup() {
 		const isError = ref(false)
-		// const formData = reactive({
-		// 	fio: 'test',
-		// 	phone2: '9050224000',
-		// 	password: '123456',
-		// 	confirmPassword: '123456',
-		// 	email: '1@mail.ru',
-		// })
+		const errorMessage = ref('')
 
 		const $store = useStore()
 		const getMe = computed(() => $store.getters['auth/getMe']) // получаем информацию о пользователе
@@ -138,25 +136,44 @@ export default defineComponent({
 			const step4 = password.currentPass !== password.pass1
 			return !!((step1 && step2 && step3 && step4))
 		})
-		const isDataValid = computed(() => checkPhone(formData.phone2) && checkFio(formData.fio))
+		const isDataValid = computed(() => {
+			// 1. formData.fio -> true && formData.phone2 = ''
+			// 2. formData.fio -> true && formData.phone2.length === 10
+			const ch1 = checkFio(formData.fio) // всегда true
+			const ch2 = checkPhone(formData.phone2)
+			const ch3 = formData.phone2 === '' || formData.phone2 === undefined || formData.phone2 === null
+			if (((ch1 === ch3) || (ch1 === ch2)) && ch1) return true
+			return false
+		})
 
 		// нажали изменить имя и телефон
-		const handleChangePhone = () => {
-
+		const handleChangePhone = async () => {
+			try {
+				if (isDataValid.value) {
+					await $store.dispatch('auth/changeUserDataAction', {
+						fio: formData.fio,
+						phone2: formData.phone2
+					})
+				}
+			} catch (error) {
+				isError.value = true
+				errorMessage.value = `При изменении данных сервер вернул ошибку: ${error}`
+			}
 		}
 
-		// изменить пароль
+		// нажали изменить пароль
 		const handleChangePassword = async () => {
 			try {
 				if (isPasswordValid.value) {
 					await $store.dispatch('auth/changePasswordAction', password)
 				}
-			} catch {
+			} catch (error) {
+				errorMessage.value = `При изменении пароля сервер вернул ошибку: ${error}`
 				isError.value = true
 			}
 		}
 
-		return { isError, formData, password, isPasswordValid, isDataValid, handleChangePhone, handleChangePassword }
+		return { isError, errorMessage, formData, password, isPasswordValid, isDataValid, handleChangePhone, handleChangePassword }
 	},
 	components: { QuasarAlert, QuasarInput }
 })

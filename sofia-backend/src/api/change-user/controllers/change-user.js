@@ -5,10 +5,6 @@
  * https://strapi.io/blog/using-database-transactions-to-write-queries-in-strapi
  */
 
-/*
-	ctx.query = { 'ingridients.ingridient_in': [ 'rice', 'tuna' ] }
-*/
-
 const bcrypt = require("bcryptjs");
 
 module.exports = {
@@ -63,3 +59,6 @@ module.exports = {
 // https://forum.strapi.io/t/applying-isowner-policy-to-user-permissions-plugin/1782/2
 
 // ctx.body = "Password valid: " + validPassword
+/*
+	ctx.query = { 'ingridients.ingridient_in': [ 'rice', 'tuna' ] }
+*/

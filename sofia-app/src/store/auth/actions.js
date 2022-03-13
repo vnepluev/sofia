@@ -62,4 +62,16 @@ export const changePasswordAction = async ({ commit }, newPassword) => {
   })
 }
 
+/**
+ * смена пароля пользователя
+ * userData: { fio: '', phone2: '' }
+ */
+export const changeUserDataAction = async ({ commit }, userData) => {
+  console.log(userData)
+  console.log(commit)
+  // await api.put('/change-user', data).then((response) => {
+  //   setToken(response, commit)
+  // })
+}
+
 // export const getMe = async ({ commit, dispatch }, token) => {}
