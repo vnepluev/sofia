@@ -30,7 +30,7 @@
 
 <script>
 import { defineComponent, reactive, ref, computed } from 'vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 import QuasarInput from '../../components/UI/QuasarInput.vue'
 
@@ -52,14 +52,21 @@ export default defineComponent({
 
     return { formData, isFormValid, isError, errorMessage }
   },
-
+  computed: {
+    ...mapGetters('auth', ['getMe'])
+  },
   methods: {
     ...mapActions('auth', ['doLoginAction']),
+
     async submitForm() {
       // логинимся на сервер
       try {
         await this.doLoginAction(this.formData)
-        this.$router.push('/auth') // входим в систему
+        if (this.$store.getters['auth/getMe'].group === 'admin') {
+          this.$router.push('/admin') // входим в систему как админ
+        } else {
+          this.$router.push('/auth') // входим в систему пользователь
+        }
       } catch (error) {
         this.isError = true
         this.errorMessage = `Пожалуйста, проверьте правильность ввода логина и пароля, либо попробуйте войти позднее.\n\n${error}`

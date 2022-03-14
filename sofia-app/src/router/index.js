@@ -29,7 +29,19 @@ export default route(({ store }) => {
   // проверка доступа к авторизованной зоне
   Router.beforeEach((to, from, next) => {
     const auth = store.getters['auth/isAuth']
+    const group = store.getters['auth/getMe'].group === 'admin'
+
+    // если неавторизованный юзер переходит в клиентскую часть
+    // или в админ часть
+    // перебрасываем на страницу логина
     if (to.matched.some((record) => record.meta.auth) && !auth) {
+      next({
+        name: 'LoginIn',
+        query: {
+          to: to.path,
+        },
+      })
+    } else if (to.matched.some((record) => record.meta.group) && !group) {
       next({
         name: 'LoginIn',
         query: {
