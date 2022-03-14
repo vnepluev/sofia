@@ -1,9 +1,15 @@
+/**
+ * устанавливаем токен и входим в систему
+ */
 export const setToken = (state, token) => {
   state.token = token
   state.isAuth = true
   localStorage.setItem('token', JSON.stringify(token))
 }
 
+/**
+ * удаляем токен и выходим из сеанса
+ */
 export const removeToken = (state) => {
   state.token = ''
   state.isAuth = false

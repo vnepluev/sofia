@@ -24,6 +24,31 @@ export const doLoginAction = async ({ commit }, payload) => {
 }
 
 /**
+ * инициализируем переменные для сессии
+ */
+export const init = async ({ commit }) => {
+  const token = JSON.parse(localStorage.getItem('token'))
+  if (token) {
+    await commit('setToken', token)
+    // информацию о пользователе в store
+    // eslint-disable-next-line
+    api.defaults.headers.common.Authorization = `Bearer ${token}`
+    // api.get('/users/me', { headers: { Authorization: `Bearer ${token}` }, })
+    await api
+      .get('/users/me', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        commit('setMe', response.data)
+      })
+  } else {
+    commit('removeToken')
+  }
+}
+
+/**
  * регистрация нового пользователя и вход в систему
  */
 export const registerNewUserAction = async ({ commit }, userData) => {
@@ -33,16 +58,9 @@ export const registerNewUserAction = async ({ commit }, userData) => {
   })
 }
 
-export const init = async ({ commit }) => {
-  //
-  const token = localStorage.getItem('token')
-  if (token) {
-    await commit('setToken', JSON.parse(token))
-  } else {
-    commit('removeToken')
-  }
-}
-
+/**
+ * Завершить сессию
+ */
 export const signOut = ({ commit }) => {
   api.defaults.headers.common.Authorization = ''
   commit('removeToken')
@@ -67,6 +85,7 @@ export const changePasswordAction = async ({ commit }, newPassword) => {
  * userData: { fio: '', phone2: '' }
  */
 export const changeUserDataAction = async ({ commit }, userData) => {
+  console.log(userData)
   await api.put('/change-user-data', userData).then((response) => {
     commit('setFioPhone2', response)
   })
