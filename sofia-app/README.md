@@ -41,6 +41,14 @@ quasar new store <store_name>
 https://quasar.dev/quasar-cli/vuex-store#introduction
 ```
 
+### Markdown
+
+```bash
+https://www.npmjs.com/package/marked
+import { marked } from 'marked'
+
+```
+
 ### Customize the configuration
 
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).

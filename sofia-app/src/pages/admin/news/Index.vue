@@ -3,48 +3,45 @@
 		<div class="q-px-lg q-pb-md">
 			<q-timeline color="primary">
 				<br />
-				<q-timeline-entry>
-					<template v-slot:title class="bold">Event Title</template>
-					<template v-slot:subtitle>February 22, 1986</template>
+				<q-timeline-entry
+					v-for="(item, index) in news"
+					:key="item.id"
+					:icon="(index % 2) ? 'tsunami' : undefined"
+				>
+					<!-- <template v-slot:title></template> -->
+					<template v-slot:subtitle>{{ item.attributes.title }}</template>
 
-					<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+					<div v-html="compiledMarked(item.attributes.text)"></div>
 				</q-timeline-entry>
-
-				<q-timeline-entry icon="tsunami">
-					<template v-slot:title>Event Title</template>
-					<template v-slot:subtitle>February 21, 1986</template>
-
-					<div>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-				</q-timeline-entry>
+				{{ news }}
 			</q-timeline>
 		</div>
 	</div>
 </template>
 
 <script>
-import { onMounted, reactive } from 'vue'
+import { onBeforeMount, reactive } from 'vue'
 import { api } from 'src/boot/axios'
+import { marked } from 'marked'
 
 export default {
 	setup() {
 		const news = reactive({})
 
-		onMounted(() => {
+		onBeforeMount(() => {
 			try {
-				api.get('/news').then((res) => Object.assign(news, res.data))
+				api.get('/news').then((res) => Object.assign(news, res.data.data))
 			} catch (error) {
 				console.log(error)
 			}
 		})
 
-		return { news }
+		const compiledMarked = (text) => marked(text, { santize: true })
+
+		return { news, compiledMarked }
 	}
 }
 </script>
 
 <style lang="scss" scoped>
-.news-card {
-	width: 100%;
-	max-width: 250px;
-}
 </style>
