@@ -32,13 +32,17 @@ export default {
 
   // если пользователь вошел в систему и пытается зайти на главную
   preFetch({ store, redirect }) {
+    // если админ
+    if (store.getters['auth/getMe'].group === 'admin' && store.getters['auth/isAuth']) {
+      return redirect({ path: '/admin' })
+    }
+
+    // если вошел пользователь
     if (store.getters['auth/isAuth']) {
       return redirect({ path: '/auth' })
     }
     return true
   },
 
-  setup() {
-  }
 }
 </script>

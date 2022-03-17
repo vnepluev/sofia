@@ -42,7 +42,11 @@ const routes = [
     path: '/admin',
     component: () => import('layouts/AdminAreaLayout.vue'),
     children: [
-      { path: '', component: () => import('src/pages/admin/news/Index.vue') },
+      {
+        name: 'LoginInAdmin',
+        path: '',
+        component: () => import('src/pages/admin/news/Index.vue'),
+      },
     ],
     meta: {
       auth: true,

@@ -105,6 +105,12 @@
       "type": "boolean",
       "default": false,
       "required": false
+    },
+    "news": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::news-id.news-id",
+      "mappedBy": "user_id"
     }
   }
 }

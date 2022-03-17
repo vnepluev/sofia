@@ -22,9 +22,23 @@
 </template>
 
 <script>
-export default {
-	name: 'AdminNewsPage',
+import { onMounted, reactive } from 'vue'
+import { api } from 'src/boot/axios'
 
+export default {
+	setup() {
+		const news = reactive({})
+
+		onMounted(() => {
+			try {
+				api.get('/news').then((res) => Object.assign(news, res.data))
+			} catch (error) {
+				console.log(error)
+			}
+		})
+
+		return { news }
+	}
 }
 </script>
 
