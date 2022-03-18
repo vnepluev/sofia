@@ -17,8 +17,8 @@
     <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
       <div class="mt-10"></div>
       <q-btn stretch flat class="text-primary w-full" to="/admin" v-if="isAuth">Новости</q-btn>
-      <q-btn stretch flat class="text-primary w-full" to="/auth/orders" v-if="isAuth">Заказы</q-btn>
-      <q-btn stretch flat class="text-primary w-full" to="/auth/orders" v-if="isAuth">Статистика</q-btn>
+      <q-btn stretch flat class="text-primary w-full" to="/admin/orders" v-if="isAuth">Заказы</q-btn>
+      <q-btn stretch flat class="text-primary w-full" to="/admin/stat" v-if="isAuth">Статистика</q-btn>
       <q-btn stretch flat class="text-primary w-full" to="/auth/options" v-if="isAuth">Настройки</q-btn>
       <q-btn stretch flat class="text-primary w-full" to="/" v-if="!isAuth">Войти</q-btn>
       <q-btn stretch flat class="text-primary w-full" @click="logout" v-else>Выйти</q-btn>
@@ -30,8 +30,8 @@
 
     <q-footer elevated class="text-white">
       <q-tabs switch-indicator>
-        <q-route-tab icon="format_list_bulleted" to="/auth/orders" replace label="Заказы" />
         <q-route-tab icon="newspaper" to="/auth/orders" replace label="Новости" />
+        <q-route-tab icon="format_list_bulleted" to="/auth/orders" replace label="Заказы" />
         <q-route-tab icon="format_list_bulleted" to="/auth/orders" replace label="Статистика" />
         <q-route-tab icon="assignment" to="/auth/options" replace label="Настройки" />
       </q-tabs>
