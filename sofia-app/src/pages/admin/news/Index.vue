@@ -1,4 +1,7 @@
 <template>
+	<!-- Спрашиваем, действительно удалить? -->
+	<quasar-confirm text="Удалить новость?" v-model="deleteNewsData.isDelete" @isOk="deleteNews" />
+
 	<div class="q-pa-md q-gutter-sm text-center">
 		<div class="q-px-lg q-pb-md">
 			<q-timeline color="primary" v-if="errorMessage.length < 1">
@@ -14,7 +17,15 @@
 					<template v-slot:subtitle>
 						<div class="flex justify-end">
 							<q-btn outline color="primary" icon="edit" size="8px" :data-id="item.id" />
-							<q-btn class="q-ml-xs" outline color="primary" icon="clear" size="8px" />
+							<q-btn
+								class="q-ml-xs"
+								outline
+								color="primary"
+								icon="clear"
+								size="8px"
+								:data-id="item.id"
+								@click="deleteHandler"
+							/>
 						</div>
 						{{ item.attributes.title }}
 					</template>
@@ -28,26 +39,53 @@
 </template>
 
 <script>
-import { onBeforeMount, ref, reactive } from 'vue'
+import QuasarConfirm from 'src/components/UI/QuasarConfirm.vue'
 import { api } from 'src/boot/axios'
+import { onMounted, ref, reactive } from 'vue'
 import { marked } from 'marked'
 
 export default {
+	components: { QuasarConfirm },
 	setup() {
-		const news = reactive({})
+		const news = ref({})
 		const errorMessage = ref('')
+		const deleteNewsData = reactive({
+			isDelete: false,
+			newsId: null
+		})
 
-		onBeforeMount(() => {
+		// получаем новости с сервера
+		const getAllNews = () => api.get('/news?sort=id:desc').then((res) => res.data.data)
+
+		onMounted(async () => {
 			try {
-				api.get('/news?sort=id:desc').then((res) => Object.assign(news, res.data.data))
+				news.value = await getAllNews()
 			} catch (error) {
 				errorMessage.value = `Не удалось получить список новостей. Сервер вернул ошибку: ${error}`
 			}
 		})
 
+		// преобразуем md разметку новости
 		const compiledMarked = (text) => marked(text, { santize: true })
 
-		return { news, compiledMarked, errorMessage }
+		// точно удаляем новость?
+		const deleteHandler = (event) => {
+			deleteNewsData.newsId = event.currentTarget.getAttribute('data-id')
+			deleteNewsData.isDelete = true
+		}
+
+		// подтвердили удаление новости
+		const deleteNews = async () => {
+			try {
+				await api.delete(`/news/${deleteNewsData.newsId}`).then(async () => {
+					news.value = await getAllNews()
+				})
+			} catch (error) {
+				errorMessage.value = `Ошибка при удалении данных: ${error} Обновите страницу`
+			}
+		}
+
+		return { news, compiledMarked, errorMessage, deleteHandler, deleteNews, deleteNewsData }
 	}
 }
 </script>

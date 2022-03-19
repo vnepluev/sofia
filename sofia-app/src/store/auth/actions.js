@@ -90,4 +90,19 @@ export const changeUserDataAction = async ({ commit }, userData) => {
   })
 }
 
+/**
+ * удаляем новость
+ */
+export const deleteNews = async (_, newsId) => {
+  await api.delete(`/news/${newsId}`)
+}
+
+/**
+ * получить все новости
+ */
+export const getAllNewsAction = async ({ commit }) => {
+  const news = await api.get('/news?sort=id:desc').then((res) => res.data.data)
+  commit('setAllNews', news)
+}
+
 // export const getMe = async ({ commit, dispatch }, token) => {}

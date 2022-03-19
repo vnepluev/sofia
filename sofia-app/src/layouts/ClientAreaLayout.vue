@@ -43,13 +43,6 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'LayoutClientArea',
-  // если пользователь не вошел в систему
-  preFetch({ store, redirect }) {
-    if (!store.getters['auth/isAuth']) {
-      return redirect({ path: '/' })
-    }
-    return true
-  },
   methods: {
     logout() {
       api.defaults.headers.common.Authorization = ''
