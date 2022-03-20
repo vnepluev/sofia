@@ -2,31 +2,20 @@
 	<!-- Спрашиваем, действительно удалить? -->
 	<quasar-confirm text="Удалить новость?" v-model="deleteNewsData.isDelete" @isOk="deleteNews" />
 
-	<!-- Редактирование новости -->
-	<q-dialog v-model="isModalShow" persistent>
-		<q-card style="min-width: 350px">
-			<q-card-section>
-				<div class="text-h6 text-primary">Заголовок новости</div>
-				<q-input dense v-model="editNewsData.title" autofocus v-close-popup @keyup.enter="editNews" />
-			</q-card-section>
-
-			<q-card-section class="q-pt-none">
-				<div class="text-h6 text-primary">Текст</div>
-				<q-input dense v-model="editNewsData.text" type="textarea" />
-			</q-card-section>
-
-			<q-card-actions align="right" class="text-primary">
-				<q-btn flat label="Отмена" v-close-popup />
-				<q-btn flat label="Редактировать" v-close-popup @click="editNews" />
-			</q-card-actions>
-		</q-card>
-	</q-dialog>
+	<!-- Редактирование/ добавление новости -->
+	<quasar-dialog
+		v-model="isModalShow"
+		:msgText="editNewsData"
+		:msgType="isNewNews"
+		@isChange="editNews"
+		@isNew="addNews"
+	/>
 
 	<div class="q-pa-md q-gutter-sm text-center">
 		<div class="q-px-lg q-pb-md">
 			<q-timeline color="primary" v-if="errorMessage.length < 1">
 				<div class="flex justify-end q-mb-lg q-mt-lg">
-					<q-btn color="primary" label="Добавить новость" />
+					<q-btn color="primary" @click="addNewsHandler" label="Добавить новость" />
 				</div>
 				<q-timeline-entry
 					v-for="(item, index) in news"
@@ -70,9 +59,10 @@ import QuasarConfirm from 'src/components/UI/QuasarConfirm.vue'
 import { api } from 'src/boot/axios'
 import { onMounted, ref, reactive } from 'vue'
 import { marked } from 'marked'
+import QuasarDialog from 'src/components/UI/QuasarDialog.vue'
 
 export default {
-	components: { QuasarConfirm },
+	components: { QuasarConfirm, QuasarDialog },
 	setup() {
 		const news = ref({})
 		const errorMessage = ref('')
@@ -119,8 +109,9 @@ export default {
 		const editNewsData = reactive({
 			newsId: null,
 			title: '',
-			text: ''
+			text: '',
 		})
+		const isNewNews = ref(false) // тип popup окна
 
 		// модальное окно для редактирования
 		const editNewsHandler = (event) => {
@@ -148,6 +139,31 @@ export default {
 			}
 		}
 
+		// добавить новость
+		const addNewsHandler = () => {
+			isNewNews.value = true // новая новость
+			editNewsData.title = ''
+			editNewsData.text = ''
+			isModalShow.value = true
+		}
+
+		// отправляем новую новость на сервер
+		const addNews = async () => {
+			try {
+				const data = {
+					data: {
+						title: editNewsData.title.trim(),
+						text: editNewsData.text.trim(),
+					}
+				}
+				await api.post('/news', data).then(async () => {
+					news.value = await getAllNews()
+				})
+			} catch (error) {
+				errorMessage.value = `Ошибка при добавлении новости: ${error} Обновите страницу`
+			}
+		}
+
 		return {
 			news,
 			compiledMarked,
@@ -158,7 +174,10 @@ export default {
 			editNewsHandler,
 			isModalShow,
 			editNewsData,
-			editNews
+			editNews,
+			isNewNews,
+			addNewsHandler,
+			addNews
 		}
 	}
 }
