@@ -56,10 +56,10 @@
 
 <script>
 import QuasarConfirm from 'src/components/UI/QuasarConfirm.vue'
+import QuasarDialog from 'src/components/UI/QuasarNewsDialog.vue'
 import { api } from 'src/boot/axios'
 import { onMounted, ref, reactive } from 'vue'
 import { marked } from 'marked'
-import QuasarDialog from 'src/components/UI/QuasarDialog.vue'
 
 export default {
 	components: { QuasarConfirm, QuasarDialog },
@@ -139,7 +139,9 @@ export default {
 			}
 		}
 
-		// добавить новость
+		/**
+		 * Добавить новость
+		 */
 		const addNewsHandler = () => {
 			isNewNews.value = true // новая новость
 			editNewsData.title = ''
@@ -147,7 +149,7 @@ export default {
 			isModalShow.value = true
 		}
 
-		// отправляем новую новость на сервер
+		// отправляем новость на сервер
 		const addNews = async () => {
 			try {
 				const data = {
