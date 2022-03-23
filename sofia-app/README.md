@@ -20,6 +20,13 @@ quasar dev
 yarn lint
 ```
 
+### Update quasar
+
+```bash
+quasar upgrade -i
+yarn add vue@3 vue-router@4
+```
+
 ### Build the app for production
 
 ```bash

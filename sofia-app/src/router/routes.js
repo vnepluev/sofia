@@ -27,6 +27,10 @@ const routes = [
         component: () => import('src/pages/auth/orders/Index.vue'),
       },
       {
+        path: '/auth/orders/add',
+        component: () => import('src/pages/auth/orders/add/Index.vue'),
+      },
+      {
         path: '/auth/options',
         component: () => import('src/pages/auth/options/Index.vue'),
       },
