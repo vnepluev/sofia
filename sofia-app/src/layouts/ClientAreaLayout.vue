@@ -22,6 +22,7 @@
       <q-btn stretch flat class="text-primary w-full" to="/" v-if="!isAuth">Войти</q-btn>
       <q-btn stretch flat class="text-primary w-full" @click="logout" v-else>Выйти</q-btn>
     </q-drawer>
+    <!-- /выпадающее меню -->
 
     <q-page-container>
       <router-view />
