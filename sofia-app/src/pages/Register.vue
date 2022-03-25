@@ -36,13 +36,6 @@
               class="pt-4"
             />
             <quasar-input type="email" v-model="formData.email" label="e-mail адрес" />
-            <!--
-            <quasar-input
-              type="tel"
-              v-model="formData.username1"
-              label="резервный номер"
-              hint="не обязательное поле"
-            />-->
 
             <quasar-input type="password" v-model="formData.password" label="пароль" />
             <quasar-input
