@@ -15,18 +15,18 @@
 				@click="step = 1"
 			/>
 			<q-breadcrumbs-el
-				:class="{ 'text-primary': step > 1 }"
+				:class="{ 'text-primary': step > 1, 'cursor-not-allowed': !isForm1Valid }"
 				class="cursor-pointer"
 				label="Детали заказа"
 				icon="widgets"
-				@click="step = 2"
+				@click="isForm1Valid ? step = 2 : false"
 			/>
 			<q-breadcrumbs-el
-				:class="{ 'text-primary': step > 2 }"
-				class="cursor-not-allowed"
+				:class="{ 'text-primary': step > 2, 'cursor-not-allowed': !isForm2Valid }"
+				class="cursor-pointer"
 				label="Подтверждение"
 				icon="thumb_up"
-				@click="step = 3"
+				@click="isForm2Valid ? step = 3 : false"
 			/>
 		</q-breadcrumbs>
 	</div>
@@ -102,7 +102,7 @@
 						<div class="text-lg">Доп. опции</div>
 
 						<!-- фотосессия -->
-						<q-toggle v-model="formData.photoValue" icon="photo_camera" label="Фотосессия (3 500 руб.)" />
+						<q-toggle v-model="formData.photoValue" icon="photo_camera" label="Фотосессия (3 000 руб.)" />
 
 						<!-- ватрушки / сап борды -->
 						<q-select outlined v-model="formData.supValue" :options="formData.sup" label="Сап борды" />
@@ -113,12 +113,15 @@
 							label="Ватрушки"
 						/>
 
-						<q-btn
-							class="full-width bg-teal text-white glossy"
-							type="submit"
-							label="Далее"
-							:disable="!isForm2Valid"
-						></q-btn>
+						<div class="flex justify-between">
+							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 1" />
+							<q-btn
+								class="w-3/5 bg-teal text-white glossy"
+								type="submit"
+								label="Далее >"
+								:disable="!isForm2Valid"
+							/>
+						</div>
 						<!-- /form data -->
 					</q-form>
 				</q-card-section>
@@ -126,6 +129,44 @@
 		</div>
 	</q-page>
 	<!-- /ШАГ 2-->
+
+	<!-- ШАГ 3 -->
+	<q-page v-if="step === 3" class="flex flex-center content-start lg:content-center">
+		<div class="p-4 space-y-4">
+			<!-- Итоговая информация -->
+			<q-card
+				class="my-card text-white"
+				style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%)"
+			>
+				<q-card-section>
+					<div class="text-center text-h6">Формируем заказ</div>
+				</q-card-section>
+			</q-card>
+
+			<div class="w-72 q-card rounded-borders rounded-xl whitespace-pre-line">
+				<q-card-section>
+					<q-form class="p-4 space-y-4 font-bold" @submit="finalStep">
+						<!-- form data -->
+						<div class="text-sm">{{ formData.choiceYachtModel }}</div>
+						<div class="text-sm">Гостей: {{ formData.people }} чел.</div>
+						<div class="text-sm">Отправление: {{ formData.date }} {{ formData.time }}</div>
+						<div class="text-sm">Длительность: {{ formData.durationValue }}</div>
+						<div v-if="formData.photoValue" class="text-sm">Включена фотосессия</div>
+
+						<div class="text-sm">{{ formData.supValue }}</div>
+						<div class="text-sm">{{ formData.waterCircleValue }}</div>
+
+						<div class="flex justify-between">
+							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 2" />
+							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Отправить" />
+						</div>
+						<!-- /form data -->
+					</q-form>
+				</q-card-section>
+			</div>
+		</div>
+	</q-page>
+	<!-- /ШАГ 3 -->
 </template>
 
 <script>
@@ -150,10 +191,12 @@ export default {
 			waterCircleValue: 'Без ватрушки'
 		})
 
-		// этапы заполнения формы
+		/**
+		 * этапы заполнения формы
+		 */
 		const step = ref(2)
 
-		// проверка заполнения формы
+		// проверка заполнения 1 формы
 		const isForm1Valid = computed(() => {
 			const check1 = formData.choiceYachtModel?.length > 0 && formData.date?.length > 0
 			const check2 = formData.time?.length > 0 && formData.durationValue?.length > 0
@@ -162,6 +205,7 @@ export default {
 			return isValid
 		})
 
+		// проверка заполнения 2 формы
 		const isForm2Valid = computed(() => formData.people > 0)
 
 		// корректируем время
@@ -176,7 +220,12 @@ export default {
 			step.value += 1
 		}
 
-		return { formData, isForm1Valid, isForm2Valid, changeTime, step, nextStep }
+		/**
+		 * Отправляем данные заказа на сервер
+		 */
+		const finalStep = () => { }
+
+		return { formData, isForm1Valid, isForm2Valid, changeTime, step, nextStep, finalStep }
 	}
 }
 </script>
