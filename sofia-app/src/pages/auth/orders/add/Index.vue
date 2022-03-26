@@ -178,6 +178,13 @@
 
 <script>
 import { ref, reactive, computed } from 'vue'
+import {
+	rentYachtPrice,
+	rentSupPrice,
+	rentWaterCirclePrice,
+	photoPrice,
+	calcEndDate
+} from '../../../../components/Helpers/CalculatePrice.js' // стоимость услуг
 
 export default {
 
@@ -200,11 +207,6 @@ export default {
 			comment: '',
 			sum: 0
 		})
-
-		const YACHT_HOURS_PRICE = 3500 // стоимость часа аренда яхты
-		const SUP_PRICE = 1000 // часовая аренда сапа
-		const WATER_CIRCLE_PRICE = 500 // часовая аренда ватрушки
-		const PHOTO_PRICE = 3000 // стоимость фотосессии
 
 		/**
 		 * этапы заполнения формы
@@ -237,23 +239,12 @@ export default {
 
 		// Вычисляем общую стоимость
 		const totalAmountSum = computed(() => {
-			let totalAmount = 0 // Общая сумма заказа
+			let totalAmount = rentYachtPrice(formData.duration, formData.durationValue).price
 
-			// вычисляем количество часов аренды яхты
-			const hours = formData.duration.findIndex((item) => item === formData.durationValue)
-			totalAmount = YACHT_HOURS_PRICE + (hours * (YACHT_HOURS_PRICE / 2))
+			totalAmount += rentSupPrice(formData.sup, formData.supValue).price
+			totalAmount += rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).price
 
-			// вычисляем стоимость доп. опций
-			const sup = formData.sup.findIndex((item) => item === formData.supValue)
-			const supAmount = sup * SUP_PRICE
-
-			const waterCircle = formData.waterCircle.findIndex((item) => item === formData.waterCircleValue)
-			const waterCircleAmount = waterCircle * WATER_CIRCLE_PRICE
-
-			if (formData.photoValue) totalAmount += PHOTO_PRICE
-
-			totalAmount += supAmount + waterCircleAmount
-			console.log('Общая сумма:', totalAmount, 'Сап борды стоимость:', supAmount, 'Ватрушки стоимость:', waterCircleAmount)
+			if (formData.photoValue) totalAmount += photoPrice()
 
 			return totalAmount
 		})
@@ -263,12 +254,13 @@ export default {
 		 */
 		const finalStep = () => {
 			// форматирование даты
-			// https://stackoverflow.com/questions/85116/display-date-time-in-users-locale-format-and-time-offset
 			// new Date(year, month, date, hours, minutes, seconds, ms)
 
 			const dateStartArr = formData.date.split('-')
 			const timeStartArr = formData.time.split(':')
+
 			const dateStart = new Date(...dateStartArr, ...timeStartArr)
+			const dateEnd = calcEndDate(dateStart, formData.duration, formData.durationValue)
 
 			// итоговые данные
 			const finalData = {
@@ -276,7 +268,7 @@ export default {
 				people_count: formData.people, // кол-во людей
 				comment: formData.comment, // комментарий
 				date_start: dateStart, // дата-время начала
-				date_end: formData.date, // дата-время завершения
+				date_end: dateEnd, // дата-время завершения
 			}
 
 			console.log('Final data:', finalData);
