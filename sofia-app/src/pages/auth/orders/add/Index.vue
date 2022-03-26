@@ -145,7 +145,7 @@
 
 			<div class="w-72 q-card rounded-borders rounded-xl whitespace-pre-line">
 				<q-card-section>
-					<q-form class="p-4 space-y-4 font-bold" @submit="finalStep">
+					<q-form class="p-4 space-y-4 font-bold" @submit.prevent="finalStep">
 						<!-- form data -->
 						<div class="text-sm">{{ formData.choiceYachtModel }}</div>
 						<div class="text-sm">Гостей: {{ formData.people }} чел.</div>
@@ -155,6 +155,13 @@
 
 						<div class="text-sm">{{ formData.supValue }}</div>
 						<div class="text-sm">{{ formData.waterCircleValue }}</div>
+
+						<div class="text-sm">Стоимость: {{ totalAmountSum }} руб.</div>
+
+						<q-card-section class="q-pt-none">
+							<div class="text-sm text-primary">Ваши пожелания:</div>
+							<q-input dense v-model="formData.comment" type="textarea" />
+						</q-card-section>
 
 						<div class="flex justify-between">
 							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 2" />
@@ -181,20 +188,28 @@ export default {
 			date: '2022-03-24', // null,
 			time: '12:00', // null,
 			duration: ['1 час', '1 час 30 мин', '2 часа', '2 часа 30 мин', '3 часа', '3 часа 30 мин', '4 часа'],
-			durationValue: null,
+			durationValue: '2 часа 30 мин', // null,
 			// form2
-			people: 0,
+			people: 1,
 			photoValue: false,
 			sup: ['Без сап борда', '1 сап борд (1 000 руб.)', '2 сап борда (2 000 руб.)'],
 			supValue: 'Без сап борда',
 			waterCircle: ['Без ватрушки', '1 ватрушка (500 руб.)', '2 ватрушки (1 000 руб.)'],
-			waterCircleValue: 'Без ватрушки'
+			waterCircleValue: 'Без ватрушки',
+			// form3
+			comment: '',
+			sum: 0
 		})
+
+		const YACHT_HOURS_PRICE = 3500 // стоимость часа аренда яхты
+		const SUP_PRICE = 1000 // часовая аренда сапа
+		const WATER_CIRCLE_PRICE = 500 // часовая аренда ватрушки
+		const PHOTO_PRICE = 3000 // стоимость фотосессии
 
 		/**
 		 * этапы заполнения формы
 		 */
-		const step = ref(2)
+		const step = ref(3)
 
 		// проверка заполнения 1 формы
 		const isForm1Valid = computed(() => {
@@ -220,12 +235,54 @@ export default {
 			step.value += 1
 		}
 
+		// Вычисляем общую стоимость
+		const totalAmountSum = computed(() => {
+			let totalAmount = 0 // Общая сумма заказа
+
+			// вычисляем количество часов аренды яхты
+			const hours = formData.duration.findIndex((item) => item === formData.durationValue)
+			totalAmount = YACHT_HOURS_PRICE + (hours * (YACHT_HOURS_PRICE / 2))
+
+			// вычисляем стоимость доп. опций
+			const sup = formData.sup.findIndex((item) => item === formData.supValue)
+			const supAmount = sup * SUP_PRICE
+
+			const waterCircle = formData.waterCircle.findIndex((item) => item === formData.waterCircleValue)
+			const waterCircleAmount = waterCircle * WATER_CIRCLE_PRICE
+
+			if (formData.photoValue) totalAmount += PHOTO_PRICE
+
+			totalAmount += supAmount + waterCircleAmount
+			console.log('Общая сумма:', totalAmount, 'Сап борды стоимость:', supAmount, 'Ватрушки стоимость:', waterCircleAmount)
+
+			return totalAmount
+		})
+
 		/**
 		 * Отправляем данные заказа на сервер
 		 */
-		const finalStep = () => { }
+		const finalStep = () => {
+			// форматирование даты
+			// https://stackoverflow.com/questions/85116/display-date-time-in-users-locale-format-and-time-offset
+			// new Date(year, month, date, hours, minutes, seconds, ms)
 
-		return { formData, isForm1Valid, isForm2Valid, changeTime, step, nextStep, finalStep }
+			const dateStartArr = formData.date.split('-')
+			const timeStartArr = formData.time.split(':')
+			const dateStart = new Date(...dateStartArr, ...timeStartArr)
+
+			// итоговые данные
+			const finalData = {
+				yacht: formData.choiceYachtModel, // *выбранная яхта
+				people_count: formData.people, // кол-во людей
+				comment: formData.comment, // комментарий
+				date_start: dateStart, // дата-время начала
+				date_end: formData.date, // дата-время завершения
+			}
+
+			console.log('Final data:', finalData);
+		}
+
+		return { formData, isForm1Valid, isForm2Valid, changeTime, step, nextStep, finalStep, totalAmountSum }
 	}
 }
 </script>
