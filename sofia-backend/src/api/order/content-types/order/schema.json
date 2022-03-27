@@ -62,6 +62,24 @@
     },
     "order_id": {
       "type": "uid"
+    },
+    "photo": {
+      "type": "integer",
+      "default": 0,
+      "max": 10,
+      "min": 0
+    },
+    "sup_board": {
+      "type": "integer",
+      "max": 2,
+      "min": 0,
+      "default": 0
+    },
+    "water_circle": {
+      "type": "integer",
+      "max": 2,
+      "min": 0,
+      "default": 0
     }
   }
 }

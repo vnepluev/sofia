@@ -53,16 +53,16 @@
 							label="Продолжительность"
 						/>
 
-						<!-- <div class="mb-4"></div>
 						<q-checkbox
 							class="text-right"
 							left-label
-							v-model="formData.agree"
-							label="Согласие на обработку персональных данных"
+							v-model="formData.isPromo"
+							label="У меня есть промокод"
 							checked-icon="task_alt"
 							unchecked-icon="highlight_off"
 						/>
-						<q-space />-->
+
+						<q-input v-if="formData.isPromo" v-model="formData.promocode" type="text" hint="Промокод" />
 
 						<q-btn
 							class="full-width bg-teal text-white glossy"
@@ -149,7 +149,7 @@
 						<!-- form data -->
 						<div class="text-sm">{{ formData.choiceYachtModel }}</div>
 						<div class="text-sm">Гостей: {{ formData.people }} чел.</div>
-						<div class="text-sm">Отправление: {{ formData.date }} {{ formData.time }}</div>
+						<div class="text-sm">Отправление: {{ formData.date }}, {{ formData.time }}</div>
 						<div class="text-sm">Длительность: {{ formData.durationValue }}</div>
 						<div v-if="formData.photoValue" class="text-sm">Включена фотосессия</div>
 
@@ -160,7 +160,7 @@
 
 						<q-card-section class="q-pt-none">
 							<div class="text-sm text-primary">Ваши пожелания:</div>
-							<q-input dense v-model="formData.comment" type="textarea" />
+							<q-input dense v-model="formData.comment" autogrow />
 						</q-card-section>
 
 						<div class="flex justify-between">
@@ -177,6 +177,7 @@
 </template>
 
 <script>
+import { api } from 'src/boot/axios.js'
 import { ref, reactive, computed } from 'vue'
 import {
 	rentYachtPrice,
@@ -187,7 +188,6 @@ import {
 } from '../../../../components/Helpers/CalculatePrice.js' // стоимость услуг
 
 export default {
-
 	setup() {
 		const formData = reactive({
 			choiceYachtModel: 'Яхта "София"', // null,
@@ -196,6 +196,8 @@ export default {
 			time: '12:00', // null,
 			duration: ['1 час', '1 час 30 мин', '2 часа', '2 часа 30 мин', '3 часа', '3 часа 30 мин', '4 часа'],
 			durationValue: '2 часа 30 мин', // null,
+			isPromo: false,
+			promocode: '',
 			// form2
 			people: 1,
 			photoValue: false,
@@ -204,8 +206,7 @@ export default {
 			waterCircle: ['Без ватрушки', '1 ватрушка (500 руб.)', '2 ватрушки (1 000 руб.)'],
 			waterCircleValue: 'Без ватрушки',
 			// form3
-			comment: '',
-			sum: 0
+			comment: ''
 		})
 
 		/**
@@ -218,14 +219,13 @@ export default {
 			const check1 = formData.choiceYachtModel?.length > 0 && formData.date?.length > 0
 			const check2 = formData.time?.length > 0 && formData.durationValue?.length > 0
 			const isValid = check1 === check2 && check1 === true
-
 			return isValid
 		})
 
 		// проверка заполнения 2 формы
 		const isForm2Valid = computed(() => formData.people > 0)
 
-		// корректируем время
+		// округляем время
 		const changeTime = () => {
 			const time = formData.time.split('')
 			time[4] = '0'
@@ -252,7 +252,7 @@ export default {
 		/**
 		 * Отправляем данные заказа на сервер
 		 */
-		const finalStep = () => {
+		const finalStep = async () => {
 			// форматирование даты
 			// new Date(year, month, date, hours, minutes, seconds, ms)
 
@@ -264,11 +264,28 @@ export default {
 
 			// итоговые данные
 			const finalData = {
-				yacht: formData.choiceYachtModel, // *выбранная яхта
-				people_count: formData.people, // кол-во людей
-				comment: formData.comment, // комментарий
-				date_start: dateStart, // дата-время начала
-				date_end: dateEnd, // дата-время завершения
+				data: {
+					yacht: formData.choiceYachtModel, // *выбранная яхта
+					people_count: formData.people, // кол-во людей
+					comment: formData.comment, // комментарий
+					date_start: dateStart.toISOString(), // дата-время начала
+					date_end: dateEnd.toISOString(), // дата-время завершения
+					promocode: formData.promocode, // промокод
+					sup_board: 0, // количество сап бордов
+					photo: 0, // часы фотосессии
+					water_circle: 0 // количество ватрушек
+				}
+			}
+
+			if (formData.photoValue) finalData.data.photo = 1
+			finalData.data.sup_board = rentSupPrice(formData.sup, formData.supValue).count
+			finalData.data.water_circle = rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).count
+
+			// отправляем данные на сервер
+			try {
+				await api.post('', JSON.stringify(finalData))
+			} catch (error) {
+				console.log(error);
 			}
 
 			console.log('Final data:', finalData);
