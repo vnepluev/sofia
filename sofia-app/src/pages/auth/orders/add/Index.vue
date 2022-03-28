@@ -192,8 +192,8 @@ export default {
 		const formData = reactive({
 			choiceYachtModel: 'Яхта "София"', // null,
 			choiceYacht: ['Яхта "София"'],
-			date: '2022-03-24', // null,
-			time: '12:00', // null,
+			date: '2022-03-28', // null,
+			time: '15:00', // null,
 			duration: ['1 час', '1 час 30 мин', '2 часа', '2 часа 30 мин', '3 часа', '3 часа 30 мин', '4 часа'],
 			durationValue: '2 часа 30 мин', // null,
 			isPromo: false,
@@ -262,28 +262,29 @@ export default {
 			const dateStart = new Date(...dateStartArr, ...timeStartArr)
 			const dateEnd = calcEndDate(dateStart, formData.duration, formData.durationValue)
 
+			let yachtName = ''
+			if (formData.choiceYachtModel === 'Яхта "София"') yachtName = 'sofia'
+
 			// итоговые данные
 			const finalData = {
-				data: {
-					yacht: formData.choiceYachtModel, // *выбранная яхта
-					people_count: formData.people, // кол-во людей
-					comment: formData.comment, // комментарий
-					date_start: dateStart.toISOString(), // дата-время начала
-					date_end: dateEnd.toISOString(), // дата-время завершения
-					promocode: formData.promocode, // промокод
-					sup_board: 0, // количество сап бордов
-					photo: 0, // часы фотосессии
-					water_circle: 0 // количество ватрушек
-				}
+				yacht_name: yachtName, // *выбранная яхта
+				people_count: formData.people, // кол-во людей
+				comment: formData.comment, // комментарий
+				date_start: dateStart.toISOString(), // дата-время начала
+				date_end: dateEnd.toISOString(), // дата-время завершения
+				promocode: formData.promocode, // промокод
+				sup_board: 0, // количество сап бордов
+				photo: 0, // часы фотосессии
+				water_circle: 0 // количество ватрушек
 			}
 
-			if (formData.photoValue) finalData.data.photo = 1
-			finalData.data.sup_board = rentSupPrice(formData.sup, formData.supValue).count
-			finalData.data.water_circle = rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).count
+			if (formData.photoValue) finalData.photo = 1
+			finalData.sup_board = rentSupPrice(formData.sup, formData.supValue).count
+			finalData.water_circle = rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).count
 
 			// отправляем данные на сервер
 			try {
-				await api.post('', JSON.stringify(finalData))
+				await api.post('/create-order', finalData)
 			} catch (error) {
 				console.log(error);
 			}

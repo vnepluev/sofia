@@ -80,6 +80,14 @@
       "max": 2,
       "min": 0,
       "default": 0
+    },
+    "yacht_name": {
+      "type": "enumeration",
+      "enum": [
+        "sofia"
+      ],
+      "default": "sofia",
+      "required": true
     }
   }
 }
