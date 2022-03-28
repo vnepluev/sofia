@@ -1,5 +1,8 @@
 <!-- Новый заказ -->
 <template>
+	<!-- Если возникла ошибка -->
+	<quasar-alert v-model="isError" title="Сервер вернул ошибку!" :text="errorMessage" />
+
 	<!-- навигация по шагам формы -->
 	<div class="q-pa-md q-gutter-sm">
 		<q-breadcrumbs class="text-gray-400">
@@ -164,8 +167,19 @@
 						</q-card-section>
 
 						<div class="flex justify-between">
-							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 2" />
-							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Отправить" />
+							<q-btn
+								class="w-1/3 bg-teal text-white glossy"
+								type="submit"
+								label="<<"
+								@click="step = 2"
+								:disable="isSubmit"
+							/>
+							<q-btn
+								class="w-3/5 bg-teal text-white glossy"
+								type="submit"
+								label="Отправить"
+								:disable="isSubmit"
+							/>
 						</div>
 						<!-- /form data -->
 					</q-form>
@@ -179,6 +193,10 @@
 <script>
 import { api } from 'src/boot/axios.js'
 import { ref, reactive, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
+import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
+
 import {
 	rentYachtPrice,
 	rentSupPrice,
@@ -189,13 +207,15 @@ import {
 
 export default {
 	setup() {
+		const $q = useQuasar();
+		const $router = useRouter();
 		const formData = reactive({
-			choiceYachtModel: 'Яхта "София"', // null,
+			choiceYachtModel: 'Яхта "София"',
 			choiceYacht: ['Яхта "София"'],
-			date: '2022-03-28', // null,
-			time: '15:00', // null,
+			date: '2022-03-28',
+			time: '15:00',
 			duration: ['1 час', '1 час 30 мин', '2 часа', '2 часа 30 мин', '3 часа', '3 часа 30 мин', '4 часа'],
-			durationValue: '2 часа 30 мин', // null,
+			durationValue: '2 часа 30 мин',
 			isPromo: false,
 			promocode: '',
 			// form2
@@ -207,47 +227,78 @@ export default {
 			waterCircleValue: 'Без ватрушки',
 			// form3
 			comment: ''
-		})
+		});
+		const isError = ref(false);
+		const errorMessage = ref('');
+		const isSubmit = ref(false) // блокируем кнопки навигации в момент отправки данных
 
 		/**
 		 * этапы заполнения формы
 		 */
-		const step = ref(3)
+		const step = ref(3);
 
 		// проверка заполнения 1 формы
 		const isForm1Valid = computed(() => {
-			const check1 = formData.choiceYachtModel?.length > 0 && formData.date?.length > 0
-			const check2 = formData.time?.length > 0 && formData.durationValue?.length > 0
-			const isValid = check1 === check2 && check1 === true
-			return isValid
-		})
+			const check1 = formData.choiceYachtModel?.length > 0 && formData.date?.length > 0;
+			const check2 = formData.time?.length > 0 && formData.durationValue?.length > 0;
+			const isValid = check1 === check2 && check1 === true;
+			return isValid;
+		});
 
 		// проверка заполнения 2 формы
-		const isForm2Valid = computed(() => formData.people > 0)
+		const isForm2Valid = computed(() => formData.people > 0);
 
 		// округляем время
 		const changeTime = () => {
-			const time = formData.time.split('')
-			time[4] = '0'
-			formData.time = time.join('')
-		}
+			const time = formData.time.split('');
+			time[4] = '0';
+			formData.time = time.join('');
+		};
 
 		// Переходим на шаг вперед
 		const nextStep = () => {
-			step.value += 1
-		}
+			step.value += 1;
+		};
 
 		// Вычисляем общую стоимость
 		const totalAmountSum = computed(() => {
-			let totalAmount = rentYachtPrice(formData.duration, formData.durationValue).price
+			let totalAmount = rentYachtPrice(formData.duration, formData.durationValue).price;
+			totalAmount += rentSupPrice(formData.sup, formData.supValue).price;
+			totalAmount += rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).price;
+			if (formData.photoValue) { totalAmount += photoPrice(); }
+			return totalAmount;
+		});
 
-			totalAmount += rentSupPrice(formData.sup, formData.supValue).price
-			totalAmount += rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).price
+		/**
+		 * Выводим диалог подтверждения
+		 */
+		const autoClose = () => {
+			let seconds = 3;
 
-			if (formData.photoValue) totalAmount += photoPrice()
+			const dialog = $q.dialog({
+				title: 'Заказ успешно создан!',
+				message: `До закрытия окна ${seconds} сек.`
+			});
 
-			return totalAmount
-		})
+			const timer = setInterval(() => {
+				seconds -= 1;
+				if (seconds > 0) {
+					dialog.update({
+						message: `До закрытия окна ${seconds} сек.`
+					});
+				} else {
+					clearInterval(timer);
+					dialog.hide();
+				}
+			}, 1000);
+
+			dialog.onOk(() => {
+				seconds = 0;
+			}).onDismiss(() => {
+				clearTimeout(timer);
+				$router.push('/auth/orders');
+			});
+		};
 
 		/**
 		 * Отправляем данные заказа на сервер
@@ -255,47 +306,62 @@ export default {
 		const finalStep = async () => {
 			// форматирование даты
 			// new Date(year, month, date, hours, minutes, seconds, ms)
+			const dateStartArr = formData.date.split('-');
+			const timeStartArr = formData.time.split(':');
+			const dateStart = new Date(...dateStartArr, ...timeStartArr);
+			const dateEnd = calcEndDate(dateStart, formData.duration, formData.durationValue);
+			let yachtName = '';
 
-			const dateStartArr = formData.date.split('-')
-			const timeStartArr = formData.time.split(':')
-
-			const dateStart = new Date(...dateStartArr, ...timeStartArr)
-			const dateEnd = calcEndDate(dateStart, formData.duration, formData.durationValue)
-
-			let yachtName = ''
-			if (formData.choiceYachtModel === 'Яхта "София"') yachtName = 'sofia'
+			if (formData.choiceYachtModel === 'Яхта "София"') { yachtName = 'sofia'; }
 
 			// итоговые данные
 			const finalData = {
-				yacht_name: yachtName, // *выбранная яхта
-				people_count: formData.people, // кол-во людей
-				comment: formData.comment, // комментарий
-				date_start: dateStart.toISOString(), // дата-время начала
-				date_end: dateEnd.toISOString(), // дата-время завершения
-				promocode: formData.promocode, // промокод
-				sup_board: 0, // количество сап бордов
-				photo: 0, // часы фотосессии
+				yacht_name: yachtName,
+				people_count: formData.people,
+				comment: formData.comment,
+				date_start: dateStart.toISOString(),
+				date_end: dateEnd.toISOString(),
+				promocode: formData.promocode,
+				sup_board: 0,
+				photo: 0,
 				water_circle: 0 // количество ватрушек
-			}
+			};
 
-			if (formData.photoValue) finalData.photo = 1
-			finalData.sup_board = rentSupPrice(formData.sup, formData.supValue).count
-			finalData.water_circle = rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).count
+			if (formData.photoValue) { finalData.photo = 1; }
+
+			finalData.sup_board = rentSupPrice(formData.sup, formData.supValue).count;
+			finalData.water_circle = rentWaterCirclePrice(formData.waterCircle, formData.waterCircleValue).count;
 
 			// отправляем данные на сервер
+			isSubmit.value = true
 			try {
-				await api.post('/create-order', finalData)
+				await api.post('/create-order', finalData).then(() => {
+					// если ок
+					autoClose();
+				});
 			} catch (error) {
-				console.log(error);
+				errorMessage.value = error.toString();
+				isError.value = true;
+			} finally {
+				isSubmit.value = false // кнопки управления делаем активными
 			}
+			// console.log('Final data:', finalData);
+		};
 
-			console.log('Final data:', finalData);
-		}
-
-		return { formData, isForm1Valid, isForm2Valid, changeTime, step, nextStep, finalStep, totalAmountSum }
-	}
+		return {
+			formData,
+			isForm1Valid,
+			isForm2Valid,
+			changeTime,
+			step,
+			nextStep,
+			finalStep,
+			totalAmountSum,
+			isError,
+			errorMessage,
+			isSubmit
+		};
+	},
+	components: { QuasarAlert }
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

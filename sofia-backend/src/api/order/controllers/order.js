@@ -56,7 +56,7 @@ module.exports = {
       reqUserData.water_circle = +water_circle;
     else return ctx.throw(400, "WaterCircle-Count-isInvalid");
 
-    // yacht_name - sofia
+    // yacht_name = sofia
     if (yacht_name.includes("sofia")) reqUserData.yacht_name = yacht_name;
     else return ctx.throw(400, "YachtName-isInvalid");
 
@@ -64,24 +64,13 @@ module.exports = {
      * Сохраняем в БД
      */
 
-    const entry = await strapi.db.query("api::order.order").create({
+    await strapi.db.query("api::order.order").create({
       data: {
         user_id: currentUserId,
         ...reqUserData,
       },
     });
 
-    console.log("user === ", currentUserId);
-    console.log(reqUserData);
-
     ctx.body = reqUserData;
   },
 };
-
-// const entries = await strapi.db.query("api::user.user").findMany({
-//   select: ["*"],
-// });
-
-/*
-	  ctx.query = { 'ingridients.ingridient_in': [ 'rice', 'tuna' ] }
-  */
