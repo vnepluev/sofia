@@ -34,6 +34,10 @@ const routes = [
         path: '/auth/options',
         component: () => import('src/pages/auth/options/Index.vue'),
       },
+      {
+        path: '/auth/calendar',
+        component: () => import('src/pages/auth/calendar/Index.vue'),
+      },
     ],
     meta: {
       auth: true,

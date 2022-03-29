@@ -53,7 +53,7 @@
 					:offset="[0, 10]"
 				>
 					<q-list style="min-width: 100px">
-						<q-item clickable v-close-popup class="hover-item">
+						<q-item clickable v-close-popup class="hover-item" to="/auth/orders/add">
 							<q-item-section>Новый заказ</q-item-section>
 						</q-item>
 						<q-item clickable v-close-popup class="hover-item">

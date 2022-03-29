@@ -1,6 +1,9 @@
 <template>
 	<div class="q-pa-md q-gutter-sm text-center">
-		<q-banner rounded class="bg-purple-8 text-white">Добро пожаловать, {{ getFio }}!</q-banner>
+		<q-banner
+			rounded
+			class="bg-purple-8 text-white"
+		>Добро пожаловать{{ getFio.length > 0 ? `, ${getFio}` : '' }}!</q-banner>
 	</div>
 
 	<div class="q-pa-md q-gutter-sm text-center">

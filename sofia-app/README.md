@@ -56,6 +56,14 @@ import { marked } from 'marked'
 
 ```
 
+### Q-calendar
+
+```bash
+quasar ext add @quasar/qcalendar@next
+quasar ext remove @quasar/qcalendar
+
+```
+
 ### Customize the configuration
 
 See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
