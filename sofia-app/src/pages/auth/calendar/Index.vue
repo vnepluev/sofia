@@ -17,7 +17,7 @@
 		<div class="text-lg mb-4">яхта "София"</div>
 		<div class="subcontent">
 			<div class="row justify-center">
-				<div style="display: flex; max-width: 1200px; width: 100%; max-height: 550px;">
+				<div style="display: flex; max-width: 1200px; width: 100%; max-height: 500px;">
 					<q-calendar-day
 						ref="calendar"
 						locale="ru"
@@ -80,7 +80,9 @@
 								>
 									<div class="title q-calendar__ellipsis text-bold">
 										{{ event.title }}
-										<q-tooltip>{{ event.time + ' - ' + event.details }}</q-tooltip>
+										<br />
+										({{ event.time + ' - ' + event.time_end }})
+										<q-tooltip>Яхта забронирована {{ event.time + ' - ' + event.time_end }}</q-tooltip>
 									</div>
 								</div>
 							</template>
@@ -109,6 +111,7 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarTransitions.sass'
 import '@quasar/quasar-ui-qcalendar/src/QCalendarDay.sass'
 
 import { defineComponent } from 'vue'
+import { api } from 'src/boot/axios'
 
 export default defineComponent({
 	name: 'WeekCellWidth',
@@ -119,43 +122,28 @@ export default defineComponent({
 		return {
 			selectedDate: today(),
 			events: [
-				{
-					id: 1,
-					title: 'Забронировано',
-					details: '14:30 бронь',
-					date: today(),
-					time: '01:00',
-					duration: 90,
-					bgcolor: 'red'
-				},
-				{
-					id: 2,
-					title: 'Lunch',
-					details: 'Company is paying!',
-					date: today(),
-					time: '12:00',
-					duration: 60,
-					bgcolor: 'teal',
-				},
-				{
-					id: 3,
-					title: 'Conference',
-					details: 'Teaching Javascript 101',
-					date: today(),
-					time: '13:00',
-					duration: 240,
-					bgcolor: 'blue',
-				},
-				{
-					id: 4,
-					title: 'Girlfriend',
-					details: 'Meet GF for dinner at Swanky Restaurant',
-					date: today(),
-					time: '19:00',
-					duration: 180,
-					bgcolor: 'teal-2',
-				}
+				// {
+				// 	id: 1,
+				// 	title: 'Забронировано',
+				// 	time_end: '14:30',
+				// 	date: today(),
+				// 	time: '01:00',
+				// 	duration: 90,
+				// 	bgcolor: 'red'
+				// },
 			]
+		}
+	},
+	/**
+	 * получаем события для календаря
+	 */
+	created() {
+		try {
+			api.get('/public-orders').then((res) => {
+				this.events = [...res.data]
+			})
+		} catch (error) {
+			console.log(error);
 		}
 	},
 	computed: {

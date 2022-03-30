@@ -3,6 +3,8 @@
 // $gte - больше или равен
 // $lte - меньше или равен
 // https://learn.javascript.ru/datetime
+// https://stackoverflow.com/questions/8935414/getminutes-0-9-how-to-display-two-digit-numbers
+// https://only-to-top.ru/blog/coding/2019-08-11-vychitanie-dat-javascript.html
 
 module.exports = {
   // ===
@@ -32,18 +34,26 @@ module.exports = {
       const startTime = new Date(entries[el].date_start);
       const endTime = new Date(entries[el].date_end);
 
-      const resultTime = startTime.toLocaleString("ru", {
+      const startTimeStart = startTime.toLocaleString("ru", {
         hour: "2-digit",
         minute: "2-digit",
       });
-      const resultDate = startTime.toLocaleString("ru", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
+      const endTimeStart = endTime.toLocaleString("ru", {
+        hour: "2-digit",
+        minute: "2-digit",
       });
+      const resultDate = startTime
+        .toLocaleString("ru", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+        })
+        .split(".")
+        .reverse()
+        .join("-");
 
-      entries[el].details = `${resultTime} бронь`; // подсказка
-      entries[el].time = resultTime; // время начала
+      entries[el].time_end = endTimeStart; // подсказка
+      entries[el].time = startTimeStart; // время начала
       entries[el].date = resultDate; // дата начала
       entries[el].duration = (endTime - startTime) / (60 * 1000); // продолжительность в минутах
 
