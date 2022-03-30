@@ -14,5 +14,14 @@ module.exports = {
         middlewares: [],
       },
     },
+    {
+      method: "GET",
+      path: "/public-orders",
+      handler: "public-order.getPublicOrders",
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };

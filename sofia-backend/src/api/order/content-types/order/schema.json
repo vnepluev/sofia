@@ -60,9 +60,6 @@
       "type": "boolean",
       "default": false
     },
-    "order_id": {
-      "type": "uid"
-    },
     "photo": {
       "type": "integer",
       "default": 0,

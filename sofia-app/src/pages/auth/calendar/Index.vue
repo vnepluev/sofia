@@ -2,6 +2,14 @@
 	Вид календаря
 	https://qcalendar.netlify.app/examples/day-cell-width
 	https://qcalendar.netlify.app/developing/qcalendarday/day-slot-day-body
+
+	Работа с разницей в датах
+	https://russianblogs.com/article/7994272970/
+	https://www.cyberforum.ru/javascript-beginners/thread2545891.html
+
+	Проверить дату, входит ли в указанный диапазон
+	https://ru.stackoverflow.com/questions/659432/js-%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-%D0%B4%D0%B0%D1%82%D1%8B-%D0%B2-%D0%BF%D0%B5%D1%80%D0%B8%D0%BE%D0%B4%D0%B5
+	https://qna.habr.com/q/555676
  -->
 <template>
 	<div class="q-pa-md q-gutter-sm text-center">
@@ -70,7 +78,7 @@
 									:class="badgeClasses(event, 'body')"
 									:style="badgeStyles(event, 'body', timeStartPos, timeDurationHeight)"
 								>
-									<div class="title q-calendar__ellipsis">
+									<div class="title q-calendar__ellipsis text-bold">
 										{{ event.title }}
 										<q-tooltip>{{ event.time + ' - ' + event.details }}</q-tooltip>
 									</div>
@@ -113,8 +121,8 @@ export default defineComponent({
 			events: [
 				{
 					id: 1,
-					title: 'Meeting',
-					details: 'Time to pitch my idea to the company',
+					title: 'Забронировано',
+					details: '14:30 бронь',
 					date: today(),
 					time: '01:00',
 					duration: 90,
