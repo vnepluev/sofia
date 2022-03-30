@@ -15,7 +15,8 @@
 	<div class="q-pa-md q-gutter-sm text-center">
 		<div class="text-lg">Расписание выходов</div>
 		<div class="text-lg mb-4">яхта "София"</div>
-		<div class="subcontent">
+		<quasar-spinner v-if="isLoading" />
+		<div class="subcontent" v-else>
 			<div class="row justify-center">
 				<div style="display: flex; max-width: 1200px; width: 100%; max-height: 500px;">
 					<q-calendar-day
@@ -112,14 +113,17 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarDay.sass'
 
 import { defineComponent } from 'vue'
 import { api } from 'src/boot/axios'
+import QuasarSpinner from 'src/components/UI/QuasarSpinner.vue'
 
 export default defineComponent({
 	name: 'WeekCellWidth',
 	components: {
-		QCalendarDay
+		QCalendarDay,
+		QuasarSpinner
 	},
 	data() {
 		return {
+			isLoading: true,
 			selectedDate: today(),
 			events: [
 				// {
@@ -140,10 +144,12 @@ export default defineComponent({
 	created() {
 		try {
 			api.get('/public-orders').then((res) => {
+				this.isLoading = false
 				this.events = [...res.data]
 			})
 		} catch (error) {
 			console.log(error);
+			this.isLoading = false
 		}
 	},
 	computed: {
