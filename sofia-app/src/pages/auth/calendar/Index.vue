@@ -12,7 +12,12 @@
 	https://qna.habr.com/q/555676
  -->
 <template>
-	<div class="q-pa-md q-gutter-sm text-center">
+	<div
+		v-if="errorMessage.length > 0"
+		class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold"
+	>{{ errorMessage }}</div>
+
+	<div v-else class="q-pa-md q-gutter-sm text-center">
 		<div class="text-lg">Расписание выходов</div>
 		<div class="text-lg mb-4">яхта "София"</div>
 		<quasar-spinner v-if="isLoading" />
@@ -124,6 +129,7 @@ export default defineComponent({
 	data() {
 		return {
 			isLoading: true,
+			errorMessage: '',
 			selectedDate: today(),
 			events: [
 				// {
@@ -142,15 +148,13 @@ export default defineComponent({
 	 * получаем события для календаря
 	 */
 	created() {
-		try {
-			api.get('/public-orders').then((res) => {
-				this.isLoading = false
-				this.events = [...res.data]
-			})
-		} catch (error) {
-			console.log(error);
+		api.get('/public-orders').then((res) => {
 			this.isLoading = false
-		}
+			this.events = [...res.data]
+		}).catch((error) => {
+			this.errorMessage = `Не удалось получить расписание. Сервер вернул ошибку: ${error}`;
+			this.isLoading = false
+		})
 	},
 	computed: {
 		// convert the events into a map of lists keyed by date
