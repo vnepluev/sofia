@@ -8,18 +8,28 @@
 	https://www.cyberforum.ru/javascript-beginners/thread2545891.html
 
 	Проверить дату, входит ли в указанный диапазон
-	https://ru.stackoverflow.com/questions/659432/js-%D0%9F%D1%80%D0%BE%D0%B2%D0%B5%D1%80%D0%BA%D0%B0-%D0%B4%D0%B0%D1%82%D1%8B-%D0%B2-%D0%BF%D0%B5%D1%80%D0%B8%D0%BE%D0%B4%D0%B5
 	https://qna.habr.com/q/555676
  -->
 <template>
+	<quasar-confirm
+		v-model="isNewOrder"
+		type="bg-teal"
+		text="Хотите сделать новый заказ?"
+		@isOk="addNewOrder"
+	/>
+
 	<div
 		v-if="errorMessage.length > 0"
 		class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold"
-	>{{ errorMessage }}</div>
+	>
+		{{
+			errorMessage
+		}}
+	</div>
 
 	<div v-else class="q-pa-md q-gutter-sm text-center">
 		<div class="text-lg">Расписание выходов</div>
-		<div class="text-lg mb-4">яхта "София"</div>
+		<div class="text-lg mb-4">яхта "Sofia"</div>
 		<quasar-spinner v-if="isLoading" />
 		<div class="subcontent" v-else>
 			<div class="row justify-center">
@@ -119,15 +129,18 @@ import '@quasar/quasar-ui-qcalendar/src/QCalendarDay.sass'
 import { defineComponent } from 'vue'
 import { api } from 'src/boot/axios'
 import QuasarSpinner from 'src/components/UI/QuasarSpinner.vue'
+import QuasarConfirm from 'src/components/UI/QuasarConfirm.vue'
 
 export default defineComponent({
 	name: 'WeekCellWidth',
 	components: {
 		QCalendarDay,
-		QuasarSpinner
+		QuasarSpinner,
+		QuasarConfirm
 	},
 	data() {
 		return {
+			isNewOrder: false, // окно добавить новый заказ?
 			isLoading: true,
 			errorMessage: '',
 			selectedDate: today(),
@@ -182,6 +195,10 @@ export default defineComponent({
 		}
 	},
 	methods: {
+		// Если пользователь хочет создать новый заказ
+		addNewOrder() {
+			return this.$router.push('/auth/orders')
+		},
 		badgeClasses(event, type) {
 			const isHeader = type === 'header'
 			return {
@@ -233,26 +250,27 @@ export default defineComponent({
 		onNext() {
 			this.$refs.calendar.next()
 		},
-		onMoved(data) {
-			console.log('onMoved', data)
+		onClickTime() {
+			this.isNewOrder = true
+			// console.log('onClickTime', data.scope.timestamp)
 		},
-		onChange(data) {
-			console.log('onChange', data)
+		onClickInterval() {
+			return false
 		},
-		onClickDate(data) {
-			console.log('onClickDate', data)
+		onClickHeadIntervals() {
+			return false
 		},
-		onClickTime(data) {
-			console.log('onClickTime', data)
+		onMoved() {
+			return false
 		},
-		onClickInterval(data) {
-			console.log('onClickInterval', data)
+		onChange() {
+			return false
 		},
-		onClickHeadIntervals(data) {
-			console.log('onClickHeadIntervals', data)
+		onClickDate() {
+			return false
 		},
-		onClickHeadDay(data) {
-			console.log('onClickHeadDay', data)
+		onClickHeadDay() {
+			return false
 		}
 	}
 })
