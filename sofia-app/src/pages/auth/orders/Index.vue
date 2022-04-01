@@ -42,8 +42,15 @@
 		</div>
 		<!-- /таблица заказов -->
 
+		<!-- кнопки добавить новый заказ -->
+		<div class="q-pa-md q-gutter-sm">
+			<q-btn color="primary" to="/auth/orders/add" label="Новый заказ" />
+			<q-btn color="primary" label="Активация сертификата" />
+		</div>
+		<!-- /кнопки добавить новый заказ -->
+
 		<!-- добавить новый заказ -->
-		<div class="q-pa-md block">
+		<!-- <div class="q-pa-md block">
 			<q-btn class="glossy m-4" round color="primary" icon="add_circle_outline">
 				<q-menu
 					transition-show="scale"
@@ -62,7 +69,7 @@
 					</q-list>
 				</q-menu>
 			</q-btn>
-		</div>
+		</div>-->
 		<!-- /добавить новый заказ -->
 	</q-page>
 </template>

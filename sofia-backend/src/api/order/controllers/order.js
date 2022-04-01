@@ -1,3 +1,6 @@
+// Проверить дату, входит ли в указанный диапазон
+// https://qna.habr.com/q/555676
+
 module.exports = {
   // ===
   // создаем новый заказ на аренду яхт
@@ -31,6 +34,40 @@ module.exports = {
       dateNow > dateStart ||
       dateStart.getTime() === dateEnd.getTime();
     if (checkDate) return ctx.throw(400, "Date-Start-isInvalid");
+
+    // проверка на занятую дату
+    const entries = await strapi.db.query("api::order.order").findMany({
+      select: ["id", "date_start", "date_end"],
+      where: {
+        $and: [
+          // БД <= Start
+          { date_start: { $lte: dateStart } },
+          // БД >= Start
+          { date_end: { $gte: dateStart } },
+        ],
+        $and: [
+          // БД <= End
+          { date_start: { $lte: dateEnd } },
+          // БД >= End
+          { date_end: { $gte: dateEnd } },
+        ],
+      },
+    });
+
+    console.log("==========================================");
+    console.log(
+      "Старт: ",
+      dateStart.toLocaleDateString(),
+      dateStart.toLocaleTimeString()
+    );
+    console.log(
+      "Финиш: ",
+      dateEnd.toLocaleDateString(),
+      dateEnd.toLocaleTimeString()
+    );
+    console.log(entries);
+
+    return;
 
     reqUserData.date_start = dateStart;
     reqUserData.date_end = dateEnd;

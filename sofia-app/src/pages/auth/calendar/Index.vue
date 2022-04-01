@@ -6,9 +6,6 @@
 	Работа с разницей в датах
 	https://russianblogs.com/article/7994272970/
 	https://www.cyberforum.ru/javascript-beginners/thread2545891.html
-
-	Проверить дату, входит ли в указанный диапазон
-	https://qna.habr.com/q/555676
  -->
 <template>
 	<quasar-confirm
