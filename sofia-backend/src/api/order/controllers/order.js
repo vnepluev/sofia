@@ -49,25 +49,27 @@ module.exports = {
           // БД <= End
           { date_start: { $lte: dateEnd } },
           // БД >= End
-          { date_end: { $gte: dateEnd } },
+          { date_end: { $gte: dateStart } },
         ],
       },
     });
 
-    console.log("==========================================");
-    console.log(
-      "Старт: ",
-      dateStart.toLocaleDateString(),
-      dateStart.toLocaleTimeString()
-    );
-    console.log(
-      "Финиш: ",
-      dateEnd.toLocaleDateString(),
-      dateEnd.toLocaleTimeString()
-    );
-    console.log(entries);
+    console.log("===========================", entries);
 
-    return;
+    if (Object.keys(entries).length > 0) return ctx.throw(405, "Date-isBusy");
+
+    // console.log("==========================================");
+    // console.log(
+    //   "Старт: ",
+    //   dateStart.toLocaleDateString(),
+    //   dateStart.toLocaleTimeString()
+    // );
+    // console.log(
+    //   "Финиш: ",
+    //   dateEnd.toLocaleDateString(),
+    //   dateEnd.toLocaleTimeString()
+    // );
+    // console.log(entries);
 
     reqUserData.date_start = dateStart;
     reqUserData.date_end = dateEnd;

@@ -212,8 +212,8 @@ export default {
 		const formData = reactive({
 			choiceYachtModel: 'Яхта "София"',
 			choiceYacht: ['Яхта "София"'],
-			date: '2022-03-28',
-			time: '15:00',
+			date: '2022-04-07',
+			time: '09:40',
 			duration: ['1 час', '1 час 30 мин', '2 часа', '2 часа 30 мин', '3 часа', '3 часа 30 мин', '4 часа'],
 			durationValue: '2 часа 30 мин',
 			isPromo: false,
@@ -340,7 +340,11 @@ export default {
 					autoClose();
 				});
 			} catch (error) {
-				errorMessage.value = error.toString();
+				if (error.response.status === 405) {
+					errorMessage.value = 'Извините, выбранное вами время было забронировано ранее';
+				} else {
+					errorMessage.value = error.toString();
+				}
 				isError.value = true;
 			} finally {
 				isSubmit.value = false // кнопки управления делаем активными
