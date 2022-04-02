@@ -1,6 +1,13 @@
 // Проверить дату, входит ли в указанный диапазон
 // https://qna.habr.com/q/555676
 
+// правильный вывод ошибки
+//  catch (err) {
+//    return 500 error
+//    ctx.response.status = 500;
+//    return { error: { message: "There was a problem creating the charge" } };
+//  }
+
 module.exports = {
   // ===
   // создаем новый заказ на аренду яхт
@@ -36,7 +43,7 @@ module.exports = {
     if (checkDate) return ctx.throw(400, "Date-Start-isInvalid");
 
     // проверка на занятую дату
-    const entries = await strapi.db.query("api::order.order").findMany({
+    const entries = await strapi.db.query("api::order.order").findOne({
       select: ["id", "date_start", "date_end"],
       where: {
         $and: [
@@ -48,28 +55,13 @@ module.exports = {
         $and: [
           // БД <= End
           { date_start: { $lte: dateEnd } },
-          // БД >= End
+          // БД >= Start
           { date_end: { $gte: dateStart } },
         ],
       },
     });
 
-    console.log("===========================", entries);
-
     if (Object.keys(entries).length > 0) return ctx.throw(405, "Date-isBusy");
-
-    // console.log("==========================================");
-    // console.log(
-    //   "Старт: ",
-    //   dateStart.toLocaleDateString(),
-    //   dateStart.toLocaleTimeString()
-    // );
-    // console.log(
-    //   "Финиш: ",
-    //   dateEnd.toLocaleDateString(),
-    //   dateEnd.toLocaleTimeString()
-    // );
-    // console.log(entries);
 
     reqUserData.date_start = dateStart;
     reqUserData.date_end = dateEnd;
@@ -102,7 +94,6 @@ module.exports = {
     /**
      * Сохраняем в БД
      */
-
     await strapi.db.query("api::order.order").create({
       data: {
         user_id: currentUserId,
