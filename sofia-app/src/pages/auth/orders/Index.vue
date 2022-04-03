@@ -1,13 +1,26 @@
+<!--
+	преобразование даты в локальный формат
+	http://old.code.mu/javascript/date/toLocaleString.html
+-->
 <template>
 	<q-page class="flex flex-center">
+		<!-- Индикатор загрузки -->
+		<quasar-spinner v-if="isLoading" />
+
+		<!-- Сообщение об ошибке -->
+		<div
+			v-if="errorMessage.length > 0"
+			class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold"
+		>{{ errorMessage }}</div>
+
 		<!-- таблица заказов -->
 		<div class="q-pa-md w-full">
-			<q-markup-table separator="vertical" flat bordered>
+			<q-markup-table v-if="!isLoading && errorMessage.length < 1" separator="vertical" flat bordered>
 				<thead class="bg-teal glossy">
 					<tr>
 						<th colspan="4">
 							<div class="row no-wrap items-center">
-								<div class="text-h4 q-ml-md text-white">Мои заказы</div>
+								<div class="text-h5 q-ml-md text-white">Мои заказы</div>
 							</div>
 						</th>
 					</tr>
@@ -19,23 +32,11 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="hover-item">
-						<td class="text-left">Яхта "София"</td>
-						<td class="text-right">10:00</td>
-						<td class="text-right">12:00</td>
-						<td class="text-right">4</td>
-					</tr>
-					<tr class="hover-item">
-						<td class="text-left">Яхта "София"</td>
-						<td class="text-right">14:00</td>
-						<td class="text-right">15:30</td>
-						<td class="text-right">3</td>
-					</tr>
-					<tr>
-						<td class="text-left">Яхта "София"</td>
-						<td class="text-right">17:30</td>
-						<td class="text-right">19:30</td>
-						<td class="text-right">2</td>
+					<tr class="hover-item" v-for="orders in myOrders" :key="orders.id">
+						<td class="text-left">{{ orders.yacht_name === 'sofia' ? 'Яхта "София"' : '' }}</td>
+						<td class="text-right">{{ orders.date_start }}</td>
+						<td class="text-right">{{ orders.date_end }}</td>
+						<td class="text-right">{{ orders.people_count }}</td>
 					</tr>
 				</tbody>
 			</q-markup-table>
@@ -75,8 +76,55 @@
 </template>
 
 <script>
-export default {
+import { onBeforeMount, ref } from 'vue'
+import QuasarSpinner from 'src/components/UI/QuasarSpinner.vue'
+import { api } from 'src/boot/axios'
 
+export default {
+	setup() {
+		const isLoading = ref(true)
+		const errorMessage = ref('')
+		const myOrders = ref([])
+
+		// получаем мои заказы с сервера
+		const getMyOrders = () => api.get('/my-orders')
+			.then((res) => {
+				isLoading.value = false
+				// long - словами; numeric - числом
+				res.data.forEach((order) => {
+					let d = new Date(order.date_start)
+					order.date_start = d.toLocaleString('ru', {
+						year: 'numeric',
+						month: 'numeric',
+						day: 'numeric',
+						timezone: 'UTC',
+						hour: 'numeric',
+						minute: 'numeric',
+					})
+					d = new Date(order.date_end)
+					order.date_end = d.toLocaleString('ru', {
+						year: 'numeric',
+						month: 'numeric',
+						day: 'numeric',
+						timezone: 'UTC',
+						hour: 'numeric',
+						minute: 'numeric',
+					})
+				});
+				return res.data
+			})
+			.catch((error) => {
+				errorMessage.value = `Не удалось получить расписание. Сервер вернул ошибку: ${error}`
+				isLoading.value = false
+			})
+
+		onBeforeMount(async () => {
+			myOrders.value = await getMyOrders()
+		})
+
+		return { isLoading, errorMessage, myOrders }
+	},
+	components: { QuasarSpinner }
 }
 </script>
 

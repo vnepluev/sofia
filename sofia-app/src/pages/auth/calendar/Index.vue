@@ -18,11 +18,7 @@
 	<div
 		v-if="errorMessage.length > 0"
 		class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold"
-	>
-		{{
-			errorMessage
-		}}
-	</div>
+	>{{ errorMessage }}</div>
 
 	<div v-else class="q-pa-md q-gutter-sm text-center">
 		<div class="text-lg">Расписание выходов</div>
