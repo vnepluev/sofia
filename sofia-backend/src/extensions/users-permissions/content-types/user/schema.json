@@ -83,11 +83,6 @@
       "type": "richtext",
       "private": true
     },
-    "group": {
-      "type": "string",
-      "default": "user",
-      "required": false
-    },
     "orders": {
       "type": "relation",
       "relation": "oneToMany",
@@ -111,6 +106,15 @@
       "relation": "oneToMany",
       "target": "api::news-id.news-id",
       "mappedBy": "user_id"
+    },
+    "group": {
+      "type": "enumeration",
+      "enum": [
+        "user",
+        "captain",
+        "admin"
+      ],
+      "default": "user"
     }
   }
 }

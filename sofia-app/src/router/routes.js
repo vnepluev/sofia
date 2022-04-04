@@ -55,6 +55,11 @@ const routes = [
         path: '',
         component: () => import('src/pages/admin/news/Index.vue'),
       },
+      {
+        name: 'UserList',
+        path: '/admin/user-list',
+        component: () => import('src/pages/admin/user-list/Index.vue'),
+      },
     ],
     meta: {
       auth: true,

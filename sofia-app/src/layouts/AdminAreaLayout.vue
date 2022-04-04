@@ -30,9 +30,9 @@
 
     <q-footer elevated class="text-white">
       <q-tabs switch-indicator>
-        <q-route-tab icon="newspaper" to="/auth/orders" replace label="Новости" />
+        <q-route-tab icon="public" to="/admin" replace label="News" />
+        <q-route-tab icon="group" to="/admin/user-list" replace label="Users" />
         <q-route-tab icon="format_list_bulleted" to="/auth/orders" replace label="Заказы" />
-        <q-route-tab icon="format_list_bulleted" to="/auth/orders" replace label="Статистика" />
         <q-route-tab icon="assignment" to="/auth/options" replace label="Настройки" />
       </q-tabs>
     </q-footer>

@@ -18,7 +18,7 @@
 			<q-markup-table v-if="!isLoading && errorMessage.length < 1" separator="vertical" flat bordered>
 				<thead class="bg-teal glossy">
 					<tr>
-						<th colspan="4">
+						<th colspan="5">
 							<div class="row no-wrap items-center">
 								<div class="text-h5 q-ml-md text-white">Мои заказы</div>
 							</div>
@@ -29,6 +29,7 @@
 						<th class="text-right">Начало</th>
 						<th class="text-right">Завершение</th>
 						<th class="text-right">Пассажиров</th>
+						<th class="text-right">Статус</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -37,7 +38,13 @@
 						<td class="text-right">{{ orders.date_start }}</td>
 						<td class="text-right">{{ orders.date_end }}</td>
 						<td class="text-right">{{ orders.people_count }}</td>
+						<td class="text-right">В обработке</td>
 					</tr>
+					<th colspan="5" v-if="myOrders.length < 1">
+						<div class="row no-wrap items-center">
+							<div class="text-sm q-ml-md">Создайте свой первый заказ</div>
+						</div>
+					</th>
 				</tbody>
 			</q-markup-table>
 		</div>
