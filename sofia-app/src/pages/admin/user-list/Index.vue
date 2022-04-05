@@ -4,11 +4,12 @@
 			title="Список пользователей"
 			:rows="rows"
 			:columns="columns"
-			row-key="name"
+			row-key="username"
 			:selected-rows-label="getSelectedString"
 			selection="multiple"
 			v-model:selected="selected"
 			:loading="isLoading"
+			@request="onRequest"
 		>
 			<template v-slot:loading>
 				<q-inner-loading
@@ -25,134 +26,99 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { api } from 'src/boot/axios'
 
 const columns = [
-	{
-		name: 'desc',
-		required: true,
-		label: 'username',
-		align: 'left',
-		field: (row) => row.name,
-		format: (val) => `${val}`,
-		sortable: true
-	},
-	{ name: 'fio', label: 'fio', field: 'fat', sortable: true },
-	{ name: 'phone2', align: 'center', label: 'phone 2', field: 'calories', sortable: true },
-	{ name: 'blocked', label: 'blocked', field: 'carbs' },
-	{ name: 'telegram_nickname', label: 'telegram_nickname', field: 'protein' },
-	{ name: 'group', label: 'group', field: 'sodium' },
-	{ name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-	{ name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
+	{ name: 'username', label: 'phone', field: 'username', sortable: true },
+	{ name: 'phone2', align: 'center', label: 'phone 2', field: 'phone2', sortable: true },
+	{ name: 'fio', label: 'fio', field: 'fio', sortable: true },
+	{ name: 'blocked', label: 'blocked', field: 'blocked', sortable: true },
+	{ name: 'telegram_nickname', label: 'telegram_nickname', field: 'telegram_nickname' },
+	{ name: 'group', label: 'group', field: 'group', sortable: true },
+	{ name: 'createdAt', label: 'createdAt', field: 'createdAt', sortable: true },
 ]
 
-const rows = [
-	{
-		name: 'Frozen Yogurt',
-		calories: 159,
-		fat: 6.0,
-		carbs: 24,
-		protein: 4.0,
-		sodium: 87,
-		calcium: '14%',
-		iron: '1%'
-	},
-	{
-		name: 'Ice cream sandwich',
-		calories: 237,
-		fat: 9.0,
-		carbs: 37,
-		protein: 4.3,
-		sodium: 129,
-		calcium: '8%',
-		iron: '1%'
-	},
-	{
-		name: 'Eclair',
-		calories: 262,
-		fat: 16.0,
-		carbs: 23,
-		protein: 6.0,
-		sodium: 337,
-		calcium: '6%',
-		iron: '7%'
-	},
-	{
-		name: 'Cupcake',
-		calories: 305,
-		fat: 3.7,
-		carbs: 67,
-		protein: 4.3,
-		sodium: 413,
-		calcium: '3%',
-		iron: '8%'
-	},
-	{
-		name: 'Gingerbread',
-		calories: 356,
-		fat: 16.0,
-		carbs: 49,
-		protein: 3.9,
-		sodium: 327,
-		calcium: '7%',
-		iron: '16%'
-	},
-	{
-		name: 'Jelly bean',
-		calories: 375,
-		fat: 0.0,
-		carbs: 94,
-		protein: 0.0,
-		sodium: 50,
-		calcium: '0%',
-		iron: '0%'
-	},
-	{
-		name: 'Lollipop',
-		calories: 392,
-		fat: 0.2,
-		carbs: 98,
-		protein: 0,
-		sodium: 38,
-		calcium: '0%',
-		iron: '2%'
-	},
-	{
-		name: 'Honeycomb',
-		calories: 408,
-		fat: 3.2,
-		carbs: 87,
-		protein: 6.5,
-		sodium: 562,
-		calcium: '0%',
-		iron: '45%'
-	},
-	{
-		name: 'Donut',
-		calories: 452,
-		fat: 25.0,
-		carbs: 51,
-		protein: 4.9,
-		sodium: 326,
-		calcium: '2%',
-		iron: '22%'
-	},
-	{
-		name: 'KitKat',
-		calories: 518,
-		fat: 26.0,
-		carbs: 65,
-		protein: 7,
-		sodium: 54,
-		calcium: '12%',
-		iron: '6%'
-	}
-]
+/**
+ * настроить пагинацию
+ * <q-table
+		title="Treats"
+		:rows="rows"
+		:columns="columns"
+		row-key="name"
+		:pagination="initialPagination"
+	 />
+ *      initialPagination: {
+		  sortBy: 'desc',
+		  descending: false,
+		  page: 2,
+		  rowsPerPage: 3
+		  // rowsNumber: xx if getting data from a server
+		},
+
+		// добавить 2 кнопки сверху
+		<template v-slot:top>
+		  <q-btn color="primary" :disable="loading" label="Add row" @click="addRow" />
+		  <q-btn class="q-ml-sm" color="primary" :disable="loading" label="Remove row" @click="removeRow" />
+		  <q-space />
+		  <q-input borderless dense debounce="300" color="primary" v-model="filter">
+			 <template v-slot:append>
+				<q-icon name="search" />
+			 </template>
+		  </q-input>
+		</template>
+ */
 
 export default {
 	setup() {
 		const isLoading = ref(false)
 		const selected = ref([])
+		const pagination = ref({
+			sortBy: 'desc',
+			descending: false,
+			page: 1,
+			rowsPerPage: 3,
+			rowsNumber: 10
+		})
+
+		// запрашиваем данные с сервера
+		const rows = ref([])
+
+		const onRequest = async (props) => {
+			const { page, rowsPerPage, sortBy, descending } = props.pagination
+			const { filter } = props
+			console.log(filter, page, rowsPerPage, sortBy, descending);
+
+			isLoading.value = true
+
+			await api.get('/user-list').then((res) => {
+				pagination.value.rowsNumber = res.data.shift().total_entries // общее кол-во записей
+
+				// fetch data from "server"
+				res.data.forEach((element) => {
+					const date = new Date(element.createdAt).toLocaleString('ru')
+					element.createdAt = date
+				});
+				rows.value = res.data
+
+				// don't forget to update local pagination object
+				pagination.value.page = page
+				pagination.value.rowsPerPage = rowsPerPage
+				pagination.value.sortBy = sortBy
+				pagination.value.descending = descending
+			})
+
+			isLoading.value = false
+		}
+
+		// инициализируем данные
+		onMounted(() => {
+			// get initial data from server (1st page)
+			onRequest({
+				pagination: pagination.value,
+				filter: undefined
+			})
+		})
 
 		return {
 			isLoading,
@@ -161,8 +127,10 @@ export default {
 			rows,
 
 			getSelectedString() {
-				return selected.value.length === 0 ? '' : `${selected.value.length} record${selected.value.length > 1 ? 's' : ''} selected of ${rows.length}`
-			}
+				return selected.value.length === 0 ? '' : `${selected.value.length} record${selected.value.length > 1 ? 's' : ''} selected of ${rows.value.length}`
+			},
+			pagination,
+			onRequest
 		}
 	}
 }
