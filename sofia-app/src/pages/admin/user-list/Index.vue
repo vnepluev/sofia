@@ -20,14 +20,21 @@
 					class="m-2"
 					color="primary"
 					:disable="isLoading || selected.length < 1"
-					label="Заблокировать"
+					label="Block"
 					@click="blockUser"
+				/>
+				<q-btn
+					class="m-2"
+					color="primary"
+					:disable="isLoading || selected.length < 1"
+					label="Unblock"
+					@click="unBlockUser"
 				/>
 				<q-btn
 					class="q-ml-sm"
 					color="primary"
 					:disable="isLoading || selected.length < 1"
-					label="Удалить"
+					label="Delete"
 					@click="removeUser"
 				/>
 				<q-space />
@@ -189,7 +196,7 @@ export default {
 		 */
 		const blockUser = async () => {
 			const userArr = onlyUserName()
-			await api.put('/block-users', userArr).then(() => {
+			await api.put('/ban-users', userArr).then(() => {
 				autoClose() // если все ок
 			}).catch((err) => {
 				// console.log(err.response.data)
@@ -198,7 +205,20 @@ export default {
 				errorMessage.value = `Возникла ошибка: ${err.response.status} ${err.response.data}`
 				isError.value = true
 			})
+			selected.value.length = 0 // очищаем выбор
+		}
 
+		/**
+		 * разблокировать пользователей
+		 */
+		const unBlockUser = async () => {
+			const userArr = onlyUserName()
+			await api.put('/unban-users', userArr).then(() => {
+				autoClose() // если все ок
+			}).catch((err) => {
+				errorMessage.value = `Возникла ошибка: ${err.response.status} ${err.response.data}`
+				isError.value = true
+			})
 			selected.value.length = 0 // очищаем выбор
 		}
 
@@ -216,7 +236,6 @@ export default {
 				errorMessage.value = `Возникла ошибка: ${err.response.status} ${err.response.data}`
 				isError.value = true
 			})
-
 			selected.value.length = 0 // очищаем выбор
 		}
 
@@ -234,6 +253,7 @@ export default {
 			pagination,
 			onRequest,
 			blockUser,
+			unBlockUser,
 			removeUser,
 			filterTableData
 		}

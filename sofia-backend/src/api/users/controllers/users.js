@@ -27,7 +27,7 @@ module.exports = {
 
       ctx.body = [{ total_entries: count }, ...users]; // ответ пользователю
     } catch (error) {
-      return ctx.throw(500, "current-password-wrong");
+      return ctx.throw(400, "Cant-Get-List-Of-Users");
     }
   },
 };
