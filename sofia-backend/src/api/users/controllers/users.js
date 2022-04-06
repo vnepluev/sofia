@@ -1,7 +1,8 @@
 "use strict";
 
 /**
- * A set of functions called "actions" for `users`
+ * Возвращает список всех зарегистрированных пользователей
+ * Todo: // limit: 10 - ограничить отправку пользователей
  */
 
 module.exports = {
@@ -21,10 +22,9 @@ module.exports = {
           ],
           sort: { createdAt: "DESC" },
           offset: 0,
-          limit: 15,
+          //limit: 10,
         });
 
-      // ctx.body = [{ total_entries: count }, ...users]; // ответ пользователю
       ctx.body = [{ total_entries: count }, ...users]; // ответ пользователю
     } catch (error) {
       return ctx.throw(500, "current-password-wrong");

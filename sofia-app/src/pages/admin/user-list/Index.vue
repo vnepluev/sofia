@@ -1,7 +1,9 @@
 <template>
+	<!-- сообщение об ошибке -->
+	<quasar-alert v-model="isError" title="Сервер вернул ошибку!" :text="errorMessage"></quasar-alert>
 	<div class="q-pa-md">
+		<div class="mb-4"></div>
 		<q-table
-			title="Список пользователей"
 			:rows="rows"
 			:columns="columns"
 			row-key="username"
@@ -11,6 +13,32 @@
 			:loading="isLoading"
 			@request="onRequest"
 		>
+			<!-- кнопки -->
+			<template v-slot:top>
+				<br />
+				<q-btn
+					class="m-2"
+					color="primary"
+					:disable="isLoading || selected.length < 1"
+					label="Заблокировать"
+					@click="blockUser"
+				/>
+				<q-btn
+					class="q-ml-sm"
+					color="primary"
+					:disable="isLoading || selected.length < 1"
+					label="Удалить"
+					@click="removeUser"
+				/>
+				<q-space />
+				<q-input borderless dense debounce="300" color="primary" v-model="filterTableData">
+					<template v-slot:append>
+						<q-icon name="search" />
+					</template>
+				</q-input>
+			</template>
+
+			<!-- индикатор загрузки -->
 			<template v-slot:loading>
 				<q-inner-loading
 					showing
@@ -28,6 +56,8 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { api } from 'src/boot/axios'
+import { useQuasar } from 'quasar'
+import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 
 const columns = [
 	{ name: 'username', label: 'phone', field: 'username', sortable: true },
@@ -55,23 +85,17 @@ const columns = [
 		  rowsPerPage: 3
 		  // rowsNumber: xx if getting data from a server
 		},
-
-		// добавить 2 кнопки сверху
-		<template v-slot:top>
-		  <q-btn color="primary" :disable="loading" label="Add row" @click="addRow" />
-		  <q-btn class="q-ml-sm" color="primary" :disable="loading" label="Remove row" @click="removeRow" />
-		  <q-space />
-		  <q-input borderless dense debounce="300" color="primary" v-model="filter">
-			 <template v-slot:append>
-				<q-icon name="search" />
-			 </template>
-		  </q-input>
-		</template>
  */
 
 export default {
+	components: { QuasarAlert },
+
 	setup() {
 		const isLoading = ref(false)
+		const isError = ref(false)
+		const errorMessage = ref('')
+
+		const $q = useQuasar()
 		const selected = ref([])
 		const pagination = ref({
 			sortBy: 'desc',
@@ -86,8 +110,8 @@ export default {
 
 		const onRequest = async (props) => {
 			const { page, rowsPerPage, sortBy, descending } = props.pagination
-			const { filter } = props
-			console.log(filter, page, rowsPerPage, sortBy, descending);
+			// const { filter } = props
+			// console.log(filter, page, rowsPerPage, sortBy, descending);
 
 			isLoading.value = true
 
@@ -120,8 +144,86 @@ export default {
 			})
 		})
 
+		// фильтруем данные в таблице
+		const filterTableData = ref()
+
+		// selected.value - список выбранных пользователей
+		const onlyUserName = () => {
+			const users = []
+			selected.value.forEach((user) => users.push(user.username))
+			return users
+		}
+
+		/**
+		 * Окно подтверждения
+		 */
+		const autoClose = () => {
+			let seconds = 3;
+
+			const dialog = $q.dialog({
+				title: 'Информация успешно обновлена!',
+				message: `До закрытия окна ${seconds} сек.`
+			});
+
+			const timer = setInterval(() => {
+				seconds -= 1;
+				if (seconds > 0) {
+					dialog.update({
+						message: `До закрытия окна ${seconds} сек.`
+					});
+				} else {
+					clearInterval(timer);
+					dialog.hide();
+				}
+			}, 1000);
+
+			dialog.onOk(() => {
+				seconds = 0;
+			}).onDismiss(() => {
+				clearTimeout(timer);
+			})
+		};
+
+		/**
+		 * заблокировать пользователей
+		 */
+		const blockUser = async () => {
+			const userArr = onlyUserName()
+			await api.put('/block-users', userArr).then(() => {
+				autoClose() // если все ок
+			}).catch((err) => {
+				// console.log(err.response.data)
+				// console.log(err.response.status)
+				// console.log(err.response.headers)
+				errorMessage.value = `Возникла ошибка: ${err.response.status} ${err.response.data}`
+				isError.value = true
+			})
+
+			selected.value.length = 0 // очищаем выбор
+		}
+
+		/**
+		 * удалить пользователей
+		 */
+		const removeUser = async () => {
+			const userArr = onlyUserName()
+			await api.put('/delete-users', userArr).then(() => {
+				autoClose() // если все ок
+			}).catch((err) => {
+				// console.log(err.response.data)
+				// console.log(err.response.status)
+				// console.log(err.response.headers)
+				errorMessage.value = `Возникла ошибка: ${err.response.status} ${err.response.data}`
+				isError.value = true
+			})
+
+			selected.value.length = 0 // очищаем выбор
+		}
+
 		return {
 			isLoading,
+			isError,
+			errorMessage,
 			selected,
 			columns,
 			rows,
@@ -130,7 +232,10 @@ export default {
 				return selected.value.length === 0 ? '' : `${selected.value.length} record${selected.value.length > 1 ? 's' : ''} selected of ${rows.value.length}`
 			},
 			pagination,
-			onRequest
+			onRequest,
+			blockUser,
+			removeUser,
+			filterTableData
 		}
 	}
 }

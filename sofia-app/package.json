@@ -10,18 +10,18 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.13.3",
+    "@quasar/extras": "^1.13.5",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "marked": "^4.0.12",
-    "quasar": "^2.6.1",
+    "quasar": "^2.6.5",
     "vue": "3",
     "vue-router": "4",
     "vuex": "^4.0.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
-    "@quasar/app-webpack": "^3.4.4",
+    "@quasar/app-webpack": "^3.4.7",
     "@quasar/quasar-app-extension-qcalendar": "^4.0.0-beta.14",
     "dotenv": "^16.0.0",
     "eslint": "^7.14.0",
