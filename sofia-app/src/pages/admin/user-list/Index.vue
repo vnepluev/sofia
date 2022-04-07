@@ -55,8 +55,6 @@
 				/>
 			</template>
 		</q-table>
-
-		<div class="q-mt-md">Selected: {{ JSON.stringify(selected) }}</div>
 	</div>
 </template>
 
