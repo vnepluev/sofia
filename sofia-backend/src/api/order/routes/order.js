@@ -32,5 +32,15 @@ module.exports = {
         middlewares: [],
       },
     },
+    // Админ: список заказов в диапазоне дат
+    {
+      method: "POST",
+      path: "/private-order-list",
+      handler: "private-order-list.getPrivateOrderList",
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };
