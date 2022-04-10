@@ -12,8 +12,7 @@
 									color="primary"
 									icon="edit"
 									size="8px"
-									:data-id="props.row.id"
-									@click="editOrderHandler"
+									:to="`/admin/order-list/${props.row.id}`"
 								/>
 							</div>
 							<strong>Яхта:</strong>
@@ -27,16 +26,36 @@
 						</q-card-section>
 						<q-separator />
 						<q-card-section class="text-right">
-							<strong>Контакт:</strong>
-							{{ props.row.user_id.username }} - {{ props.row.user_id.fio }}
+							<strong>Контакт:&nbsp;</strong>
+							<a
+								:href="`tel:+7${props.row.user_id.username}`"
+								class="text-primary"
+								target="_blank"
+							>{{ props.row.user_id.username }}</a>
+							- {{ props.row.user_id.fio }}
 							<br />
 							<div v-if="props.row.user_id.phone2">
-								<strong>Контакт:</strong>
-								{{ props.row.user_id.phone2 }}
+								<strong>Контакт:&nbsp;</strong>
+								<a
+									:href="`tel:+7${props.row.user_id.phone2}`"
+									class="text-primary"
+									target="_blank"
+								>{{ props.row.user_id.phone2 }}</a>
+							</div>
+							<div v-if="props.row.user_id.telegram_nickname">
+								<strong>Telegram:&nbsp;</strong>
+								<a
+									:href="`https://${props.row.user_id.telegram_nickname}`"
+									target="_blank"
+									class="text-primary"
+								>{{ props.row.user_id.telegram_nickname }}</a>
 							</div>
 						</q-card-section>
-						<q-separator />
-						<q-card-section class="flex flex-center flex-col">
+						<q-separator v-if="props.row.photo || props.row.water_circle || props.row.sup_board" />
+						<q-card-section
+							class="flex flex-center flex-col"
+							v-if="props.row.photo || props.row.water_circle || props.row.sup_board"
+						>
 							<div v-if="props.row.photo">
 								<strong style="color: green;">Фотосессия:</strong>
 								{{ props.row.photo }}
@@ -88,12 +107,14 @@
 
 <script>
 import { computed } from '@vue/reactivity'
-import { api } from 'src/boot/axios'
 import { onBeforeMount, ref, watch } from 'vue'
 import { date } from 'quasar'
+import { useStore } from 'vuex'
 
 export default {
 	setup() {
+		const $store = useStore()
+
 		// получаем диапазон текущей даты
 		const newDate = new Date().toLocaleString('en-US', {
 			year: 'numeric', month: '2-digit', day: '2-digit'
@@ -122,22 +143,27 @@ export default {
 		 * - дата начала
 		 * - дата завершения
 		 */
-		const getOrders = (dateStart, dateEnd) => api.post('/private-order-list', {
-			date_start: dateStart,
-			date_end: dateEnd
-		})
+		const getOrders = async (dateStart, dateEnd) => {
+			try {
+				await $store.dispatch('auth/getOrderList', {
+					dateStart,
+					dateEnd
+				})
+			} catch (error) {
+				console.log(error);
+			}
+			return $store.getters['auth/getOrderList']
+		}
 
-		onBeforeMount(() => {
+		onBeforeMount(async () => {
 			const currentDate = new Date().toISOString().split('T')[0]
-			getOrders(currentDate, currentDate).then((res) => {
-				rows.value = res.data
-			})
+			rows.value = await getOrders(currentDate, currentDate)
 		})
 
 		/**
 		 * При выборе новой даты запрашиваем данные с сервера
 		 */
-		watch(calcDate, (newValue) => {
+		watch(calcDate, async (newValue) => {
 			if (newValue === null) return
 
 			let dateStart = ''
@@ -151,17 +177,8 @@ export default {
 				dateStart = model.value.from
 				dateEnd = model.value.to
 			}
-			getOrders(dateStart, dateEnd).then((res) => {
-				rows.value = res.data
-			})
+			rows.value = await getOrders(dateStart, dateEnd)
 		})
-
-		/**
-		 * редактируем заказ
-		 */
-		const editOrderHandler = () => {
-
-		}
 
 		return {
 			selected: ref([]),
@@ -169,7 +186,6 @@ export default {
 			rows,
 			model,
 			calcDate,
-			editOrderHandler,
 			date
 		}
 	}

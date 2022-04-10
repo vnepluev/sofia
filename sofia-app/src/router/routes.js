@@ -65,6 +65,11 @@ const routes = [
         path: '/admin/order-list',
         component: () => import('src/pages/admin/order-list/Index.vue'),
       },
+      {
+        name: 'orderListId',
+        path: '/admin/order-list/:id',
+        component: () => import('src/pages/admin/order-list/OrderListId.vue'),
+      },
     ],
     meta: {
       auth: true,

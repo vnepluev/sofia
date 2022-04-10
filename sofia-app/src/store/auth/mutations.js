@@ -25,3 +25,12 @@ export const setMe = (state, me) => {
 export const setFioPhone2 = (state, resData) => {
   Object.assign(state.me, resData.data)
 }
+
+/**
+ * Сохраняем список заказов в диапазоне дат
+ * в state
+ * /admin/order-list
+ */
+export const getOrderList = (state, orderList) => {
+  state.orderList = orderList
+}

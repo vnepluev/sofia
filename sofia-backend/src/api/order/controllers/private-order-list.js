@@ -25,7 +25,7 @@ module.exports = {
     const entries = await strapi.db.query("api::order.order").findMany({
       populate: {
         user_id: {
-          select: ["username", "fio", "phone2"],
+          select: ["username", "fio", "phone2", "telegram_nickname"],
         },
       },
       where: {

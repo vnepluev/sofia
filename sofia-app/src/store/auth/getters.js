@@ -11,3 +11,5 @@ export const getToken = (state) => {
 }
 
 export const getMe = (state) => state.me
+
+export const getOrderList = (state) => state.orderList
