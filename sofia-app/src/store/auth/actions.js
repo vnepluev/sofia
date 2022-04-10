@@ -115,10 +115,16 @@ export const getAllNewsAction = async ({ commit }) => {
  * - дата завершения
  */
 export const getOrderList = async ({ commit }, dateInterval) => {
-  const orderList = await api.post('/private-order-list', {
-    date_start: dateInterval.dateStart,
-    date_end: dateInterval.dateEnd,
-  }) // массив с заказами
-
-  commit('getOrderList', orderList.data)
+  let isError = false
+  try {
+    const orderList = await api.post('/private-order-list', {
+      date_start: dateInterval.dateStart,
+      date_end: dateInterval.dateEnd,
+    }) // массив с заказами
+    commit('getOrderList', orderList?.data)
+  } catch (error) {
+    commit('getOrderList', [])
+    isError = error
+  }
+  return isError
 }

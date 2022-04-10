@@ -1,5 +1,7 @@
 <template>
 	<div class="q-pa-md">
+		<div v-if="errorMessage !== ''" class="text-xl text-red font-bold">{{ errorMessage }}</div>
+
 		<q-table grid title="Время выходов" :rows="rows" row-key="id" :filter="filter" hide-header>
 			<!--  слоты-->
 			<template v-slot:item="props">
@@ -7,13 +9,8 @@
 					<q-card>
 						<q-card-section class="text-right">
 							<div class="flex justify-start">
-								<q-btn
-									outline
-									color="primary"
-									icon="edit"
-									size="8px"
-									:to="`/admin/order-list/${props.row.id}`"
-								/>
+								<q-btn outline color="primary" icon="edit" size="8px"
+									:to="`/admin/order-list/${props.row.id}`" />
 							</div>
 							<strong>Яхта:</strong>
 							{{ props.row.yacht_name }} [{{ props.row.people_count }}]
@@ -27,35 +24,26 @@
 						<q-separator />
 						<q-card-section class="text-right">
 							<strong>Контакт:&nbsp;</strong>
-							<a
-								:href="`tel:+7${props.row.user_id.username}`"
-								class="text-primary"
-								target="_blank"
-							>{{ props.row.user_id.username }}</a>
+							<a :href="`tel:+7${props.row.user_id.username}`" class="text-primary" target="_blank">{{
+								props.row.user_id.username
+							}}</a>
 							- {{ props.row.user_id.fio }}
 							<br />
 							<div v-if="props.row.user_id.phone2">
 								<strong>Контакт:&nbsp;</strong>
-								<a
-									:href="`tel:+7${props.row.user_id.phone2}`"
-									class="text-primary"
-									target="_blank"
-								>{{ props.row.user_id.phone2 }}</a>
+								<a :href="`tel:+7${props.row.user_id.phone2}`" class="text-primary" target="_blank">{{
+									props.row.user_id.phone2
+								}}</a>
 							</div>
 							<div v-if="props.row.user_id.telegram_nickname">
 								<strong>Telegram:&nbsp;</strong>
-								<a
-									:href="`https://${props.row.user_id.telegram_nickname}`"
-									target="_blank"
-									class="text-primary"
-								>{{ props.row.user_id.telegram_nickname }}</a>
+								<a :href="`https://${props.row.user_id.telegram_nickname}`" target="_blank"
+									class="text-primary">{{ props.row.user_id.telegram_nickname }}</a>
 							</div>
 						</q-card-section>
 						<q-separator v-if="props.row.photo || props.row.water_circle || props.row.sup_board" />
-						<q-card-section
-							class="flex flex-center flex-col"
-							v-if="props.row.photo || props.row.water_circle || props.row.sup_board"
-						>
+						<q-card-section class="flex flex-center flex-col"
+							v-if="props.row.photo || props.row.water_circle || props.row.sup_board">
 							<div v-if="props.row.photo">
 								<strong style="color: green;">Фотосессия:</strong>
 								{{ props.row.photo }}
@@ -114,6 +102,7 @@ import { useStore } from 'vuex'
 export default {
 	setup() {
 		const $store = useStore()
+		const errorMessage = ref('')
 
 		// получаем диапазон текущей даты
 		const newDate = new Date().toLocaleString('en-US', {
@@ -144,14 +133,11 @@ export default {
 		 * - дата завершения
 		 */
 		const getOrders = async (dateStart, dateEnd) => {
-			try {
-				await $store.dispatch('auth/getOrderList', {
-					dateStart,
-					dateEnd
-				})
-			} catch (error) {
-				console.log(error);
-			}
+			const res = await $store.dispatch('auth/getOrderList', {
+				dateStart,
+				dateEnd
+			})
+			if (res !== false) errorMessage.value = res // если возникла ошибка
 			return $store.getters['auth/getOrderList']
 		}
 
@@ -181,12 +167,13 @@ export default {
 		})
 
 		return {
+			errorMessage,
 			selected: ref([]),
 			filter: ref(''),
 			rows,
 			model,
 			calcDate,
-			date
+			date,
 		}
 	}
 }
