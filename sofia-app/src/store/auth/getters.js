@@ -13,3 +13,7 @@ export const getToken = (state) => {
 export const getMe = (state) => state.me
 
 export const getOrderList = (state) => state.orderList
+
+export const getOrderListId = (state, getters) => (id) =>
+  // eslint-disable-next-line implicit-arrow-linebreak
+  getters.getOrderList.find((el) => +el.id === +id)

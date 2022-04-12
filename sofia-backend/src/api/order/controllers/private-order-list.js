@@ -21,6 +21,7 @@ module.exports = {
 
     // к dateEnd + 1 день для правильного вывода
     dateEnd.setDate(dateEnd.getDate() + 1);
+    dateStart.setDate(dateStart.getDate() - 1);
 
     const entries = await strapi.db.query("api::order.order").findMany({
       populate: {
@@ -34,6 +35,7 @@ module.exports = {
           { date_end: { $lte: dateEnd } },
         ],
       },
+      orderBy: { date_start: "asc" },
     });
 
     ctx.body = entries;
