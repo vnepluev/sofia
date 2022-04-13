@@ -5,7 +5,7 @@
 		<q-table grid title="Время выходов" :rows="rows" row-key="id" :filter="filter" hide-header>
 			<!--  слоты-->
 			<template v-slot:item="props">
-				<div class="q-pa-xs col-xs-12 col-sm-6 col-md-4">
+				<div class="q-pa-xs col-xs-12 col-sm-6 col-lg-4">
 					<q-card>
 						<q-card-section class="text-right">
 							<div class="flex justify-start">
@@ -14,6 +14,10 @@
 							</div>
 							<strong>Яхта:</strong>
 							{{ props.row.yacht_name }} [{{ props.row.people_count }}]
+							<br />
+							<strong>Статус:&nbsp;</strong>
+							<span class="text-teal font-bold">{{ props.row.order_status || 'Не определен' }}</span>
+							<br />
 							<br />
 							<strong>Начало:</strong>
 							{{ date.formatDate(props.row.date_start, 'HH:mm, YYYY/MM/DD') }}
@@ -57,11 +61,19 @@
 								{{ props.row.sup_board }}
 							</div>
 						</q-card-section>
-						<q-separator />
-						<q-card-section class="text-right">
-							<strong>Промокод / сертификат:</strong>
-							{{ props.row.id }}
-							<br />
+						<q-separator v-if="props.row.promocode || props.row.sert_number" />
+						<q-card-section class="text-right" v-if="props.row.promocode || props.row.sert_number">
+							<div v-if="props.row.promocode">
+								<strong>Промокод:&nbsp;</strong>
+								{{ props.row.promocode }}
+								<br />
+							</div>
+							<div v-if="props.row.sert_number">
+								<strong>Сертификат №:&nbsp;</strong>
+								{{ props.row.sert_number }}<br />
+								{{ props.row.sert_activated ? '[активирован]' : '[не активирован]' }}
+								<br />
+							</div>
 							<div v-if="props.row.comment">
 								<strong>Пожелание клиента:</strong>&nbsp;
 								<i>{{ props.row.comment }}</i>

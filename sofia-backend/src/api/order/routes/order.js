@@ -42,5 +42,15 @@ module.exports = {
         middlewares: [],
       },
     },
+    // Админ: редактируем заказ по id
+    {
+      method: "PUT",
+      path: "/private-edit-order",
+      handler: "private-edit-order.privateEditOrder",
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
   ],
 };

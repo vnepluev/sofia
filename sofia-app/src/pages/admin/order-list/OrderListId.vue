@@ -1,4 +1,7 @@
 <template>
+	<!-- сообщение об ошибке -->
+	<quasar-alert v-model="isError" title="Сервер вернул ошибку" :text="errorMessage" />
+
 	<div class="q-pa-md">
 		<h2 class="text-xl text-center">Редактирование заказа №{{ item.id }}</h2>
 	</div>
@@ -59,8 +62,8 @@
 			<!-- Кнопки подтверждения -->
 			<div class="mt-6">
 				<div class="q-gutter-md flex justify-center min-w-min max-w-lg">
-					<q-btn class="bg-teal text-white glossy" type="submit" label="Подтвердить" @click="step = 2" />
-					<q-btn class="bg-teal text-white glossy" type="submit" label="Отменить" />
+					<q-btn class="bg-teal text-white glossy" type="button" label="Подтвердить" @click.prevent="ok" />
+					<q-btn class="bg-teal text-white glossy" type="button" label="Отменить" @click.prevent="cancel" />
 				</div>
 			</div>
 		</div>
@@ -68,31 +71,55 @@
 </template>
 
 <script>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { ref } from 'vue'
+import { api } from 'src/boot/axios'
+import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 
 export default {
 	setup() {
-		const $route = useRoute()
-		const $store = useStore()
+		const $route = useRoute();
+		const $router = useRouter();
+		const $store = useStore();
 
-		const order = $store.getters['auth/getOrderListId']($route.params.id)
-		const item = ref()
-		item.value = JSON.parse(JSON.stringify(order))
+		const isError = ref(false)
+		const errorMessage = ref('');
+		const order = $store.getters['auth/getOrderListId']($route.params.id);
+		const item = ref();
 
+		item.value = JSON.parse(JSON.stringify(order));
 		// статус
-		const statusList = ['В обработке', 'Забронирован', 'Активирован', 'Одобрен', 'Завершен', 'Отклонен']
-
+		const statusList = ['В обработке', 'Забронирован', 'Завершен', 'Отклонен'];
 		// яхта
-		const yachtList = ['sofia']
+		const yachtList = ['sofia'];
+		// отмена редактирования
+		const cancel = () => {
+			$router.push('/admin/order-list/');
+		};
+		// обновляем данные на сервере
+		const ok = () => {
+			delete (item.value.user_id);
+			const reqData = { ...item.value };
 
+			errorMessage.value = ''
+			api.put('/private-edit-order', reqData).then(() => $router.push('/admin/order-list/'))
+				.catch((error) => {
+					isError.value = true
+					errorMessage.value = error.toString();
+				});
+		};
 		return {
+			isError,
+			errorMessage,
 			item,
 			statusList,
 			yachtList,
-		}
-	}
+			ok,
+			cancel,
+		};
+	},
+	components: { QuasarAlert }
 }
 </script>
 
