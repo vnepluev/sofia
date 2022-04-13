@@ -152,15 +152,13 @@ export default {
 		// отправляем новость на сервер
 		const addNews = async () => {
 			try {
-				const data = {
+				await api.post('/news', {
 					data: {
 						title: editNewsData.title.trim(),
 						text: editNewsData.text.trim(),
 					}
-				}
-				await api.post('/news', data).then(async () => {
-					news.value = await getAllNews()
 				})
+				news.value = await getAllNews();
 			} catch (error) {
 				errorMessage.value = `Ошибка при добавлении новости: ${error} Обновите страницу`
 			}
