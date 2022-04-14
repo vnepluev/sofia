@@ -3,13 +3,8 @@
 	<quasar-confirm text="Удалить новость?" v-model="deleteNewsData.isDelete" @isOk="deleteNews" />
 
 	<!-- Редактирование/ добавление новости -->
-	<quasar-dialog
-		v-model="isModalShow"
-		:msgText="editNewsData"
-		:msgType="isNewNews"
-		@isChange="editNews"
-		@isNew="addNews"
-	/>
+	<quasar-dialog v-model="isModalShow" :msgText="editNewsData" :msgType="isNewNews" @isChange="editNews"
+		@isNew="addNews" />
 
 	<div class="q-pa-md q-gutter-sm text-center">
 		<div class="q-px-lg q-pb-md">
@@ -17,31 +12,14 @@
 				<div class="flex justify-end q-mb-lg q-mt-lg">
 					<q-btn color="primary" @click="addNewsHandler" label="Добавить новость" />
 				</div>
-				<q-timeline-entry
-					v-for="(item, index) in news"
-					:key="item.id"
-					:icon="(index % 2) ? 'tsunami' : undefined"
-				>
+				<q-timeline-entry v-for="(item, index) in news" :key="item.id" :icon="(index % 2) ? 'tsunami' : undefined">
 					<!-- <template v-slot:title></template> -->
 					<template v-slot:subtitle>
 						<div class="flex justify-end">
-							<q-btn
-								outline
-								color="primary"
-								icon="edit"
-								size="8px"
-								:data-id="item.id"
-								@click="editNewsHandler"
-							/>
-							<q-btn
-								class="q-ml-xs"
-								outline
-								color="primary"
-								icon="clear"
-								size="8px"
-								:data-id="item.id"
-								@click="deleteHandler"
-							/>
+							<q-btn outline color="primary" icon="edit" size="8px" :data-id="item.id"
+								@click="editNewsHandler" />
+							<q-btn class="q-ml-xs" outline color="primary" icon="clear" size="8px" :data-id="item.id"
+								@click="deleteHandler" />
 						</div>
 						{{ item.attributes.title }}
 					</template>
@@ -152,15 +130,13 @@ export default {
 		// отправляем новость на сервер
 		const addNews = async () => {
 			try {
-				const data = {
+				await api.post('/news', {
 					data: {
 						title: editNewsData.title.trim(),
 						text: editNewsData.text.trim(),
 					}
-				}
-				await api.post('/news', data).then(async () => {
-					news.value = await getAllNews()
 				})
+				news.value = await getAllNews()
 			} catch (error) {
 				errorMessage.value = `Ошибка при добавлении новости: ${error} Обновите страницу`
 			}

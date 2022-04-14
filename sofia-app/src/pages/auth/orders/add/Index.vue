@@ -10,27 +10,12 @@
 				<q-icon size="1.5em" name="chevron_right" color="primary" />
 			</template>
 
-			<q-breadcrumbs-el
-				:class="{ 'text-primary': step > 0 }"
-				class="cursor-pointer"
-				label="Выбор услуг"
-				icon="home"
-				@click="step = 1"
-			/>
-			<q-breadcrumbs-el
-				:class="{ 'text-primary': step > 1, 'cursor-not-allowed': !isForm1Valid }"
-				class="cursor-pointer"
-				label="Детали заказа"
-				icon="widgets"
-				@click="isForm1Valid ? step = 2 : false"
-			/>
-			<q-breadcrumbs-el
-				:class="{ 'text-primary': step > 2, 'cursor-not-allowed': !isForm2Valid }"
-				class="cursor-pointer"
-				label="Подтверждение"
-				icon="thumb_up"
-				@click="isForm2Valid ? step = 3 : false"
-			/>
+			<q-breadcrumbs-el :class="{ 'text-primary': step > 0 }" class="cursor-pointer" label="Выбор услуг" icon="home"
+				@click="step = 1" />
+			<q-breadcrumbs-el :class="{ 'text-primary': step > 1, 'cursor-not-allowed': !isForm1Valid }"
+				class="cursor-pointer" label="Детали заказа" icon="widgets" @click="isForm1Valid ? step = 2 : false" />
+			<q-breadcrumbs-el :class="{ 'text-primary': step > 2, 'cursor-not-allowed': !isForm2Valid }"
+				class="cursor-pointer" label="Подтверждение" icon="thumb_up" @click="isForm2Valid ? step = 3 : false" />
 		</q-breadcrumbs>
 	</div>
 
@@ -41,38 +26,20 @@
 				<q-card-section>
 					<q-form class="p-4 space-y-4" @submit="nextStep">
 						<!-- form data -->
-						<q-select
-							outlined
-							v-model="formData.choiceYachtModel"
-							:options="formData.choiceYacht"
-							label="Выберите услугу"
-						/>
+						<q-select outlined v-model="formData.choiceYachtModel" :options="formData.choiceYacht"
+							label="Выберите услугу" />
 						<q-input v-model="formData.date" type="date" hint="Выберите дату прогулки" />
 						<q-input v-model="formData.time" type="time" @change="changeTime" hint="Время отправления" />
-						<q-select
-							outlined
-							v-model="formData.durationValue"
-							:options="formData.duration"
-							label="Продолжительность"
-						/>
+						<q-select outlined v-model="formData.durationValue" :options="formData.duration"
+							label="Продолжительность" />
 
-						<q-checkbox
-							class="text-right"
-							left-label
-							v-model="formData.isPromo"
-							label="У меня есть промокод"
-							checked-icon="task_alt"
-							unchecked-icon="highlight_off"
-						/>
+						<q-checkbox class="text-right" left-label v-model="formData.isPromo" label="У меня есть промокод"
+							checked-icon="task_alt" unchecked-icon="highlight_off" />
 
 						<q-input v-if="formData.isPromo" v-model="formData.promocode" type="text" hint="Промокод" />
 
-						<q-btn
-							class="full-width bg-teal text-white glossy"
-							type="submit"
-							label="Далее"
-							:disable="!isForm1Valid"
-						></q-btn>
+						<q-btn class="full-width bg-teal text-white glossy" type="submit" label="Далее"
+							:disable="!isForm1Valid"></q-btn>
 						<!-- /form data -->
 					</q-form>
 				</q-card-section>
@@ -90,17 +57,8 @@
 						<!-- form data -->
 						<div class="text-lg">Количество человек: {{ formData.people }}</div>
 
-						<q-slider
-							v-model="formData.people"
-							:min="0"
-							:max="12"
-							:step="1"
-							label
-							label-always
-							switch-label-side
-							color="primary"
-							style="padding: 0 10px;"
-						/>
+						<q-slider v-model="formData.people" :min="0" :max="12" :step="1" label label-always switch-label-side
+							color="primary" style="padding: 0 10px;" />
 
 						<div class="text-lg">Доп. опции</div>
 
@@ -109,21 +67,13 @@
 
 						<!-- ватрушки / сап борды -->
 						<q-select outlined v-model="formData.supValue" :options="formData.sup" label="Сап борды" />
-						<q-select
-							outlined
-							v-model="formData.waterCircleValue"
-							:options="formData.waterCircle"
-							label="Ватрушки"
-						/>
+						<q-select outlined v-model="formData.waterCircleValue" :options="formData.waterCircle"
+							label="Ватрушки" />
 
 						<div class="flex justify-between">
 							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 1" />
-							<q-btn
-								class="w-3/5 bg-teal text-white glossy"
-								type="submit"
-								label="Далее >"
-								:disable="!isForm2Valid"
-							/>
+							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Далее >"
+								:disable="!isForm2Valid" />
 						</div>
 						<!-- /form data -->
 					</q-form>
@@ -137,10 +87,7 @@
 	<q-page v-if="step === 3" class="flex flex-center content-start lg:content-center">
 		<div class="p-4 space-y-4">
 			<!-- Итоговая информация -->
-			<q-card
-				class="my-card text-white"
-				style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%)"
-			>
+			<q-card class="my-card text-white" style="background: radial-gradient(circle, #35a2ff 0%, #014a88 100%)">
 				<q-card-section>
 					<div class="text-center text-h6">Формируем заказ</div>
 				</q-card-section>
@@ -167,19 +114,10 @@
 						</q-card-section>
 
 						<div class="flex justify-between">
-							<q-btn
-								class="w-1/3 bg-teal text-white glossy"
-								type="submit"
-								label="<<"
-								@click="step = 2"
-								:disable="isSubmit"
-							/>
-							<q-btn
-								class="w-3/5 bg-teal text-white glossy"
-								type="submit"
-								label="Отправить"
-								:disable="isSubmit"
-							/>
+							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 2"
+								:disable="isSubmit" />
+							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Отправить"
+								:disable="isSubmit" />
 						</div>
 						<!-- /form data -->
 					</q-form>
@@ -212,7 +150,7 @@ export default {
 		const formData = reactive({
 			choiceYachtModel: 'Яхта "София"',
 			choiceYacht: ['Яхта "София"'],
-			date: '2022-04-07',
+			date: '2022-04-15',
 			time: '09:40',
 			duration: ['1 час', '1 час 30 мин', '2 часа', '2 часа 30 мин', '3 часа', '3 часа 30 мин', '4 часа'],
 			durationValue: '2 часа 30 мин',
@@ -307,6 +245,7 @@ export default {
 			// форматирование даты
 			// new Date(year, month, date, hours, minutes, seconds, ms)
 			const dateStartArr = formData.date.split('-');
+			dateStartArr[1] -= 1 // месяц -1
 			const timeStartArr = formData.time.split(':');
 			const dateStart = new Date(...dateStartArr, ...timeStartArr);
 			const dateEnd = calcEndDate(dateStart, formData.duration, formData.durationValue);

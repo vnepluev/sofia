@@ -21,7 +21,7 @@ module.exports = {
 
       ctx.body = data;
     } catch (error) {
-      return ctx.throw(400, "Server-Error");
+      return ctx.throw(400, "Private-Order-Edit-Error");
     }
   },
 };

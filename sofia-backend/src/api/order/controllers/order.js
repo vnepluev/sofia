@@ -29,7 +29,7 @@ module.exports = {
     /**
      * дата/время отплытия
      */
-    const dateNow = new Date(Date.now()); // текущая дата/время
+    const dateNow = new Date(); // текущая дата/время
     const dateStart = new Date(date_start); // дата/время отплытия
     const dateEnd = new Date(date_end); // дата/время прибытия
 
@@ -44,7 +44,7 @@ module.exports = {
 
     // проверка на занятую дату
     const entries = await strapi.db.query("api::order.order").findOne({
-      select: ["id", "date_start", "date_end"],
+      select: ["id", "date_start", "date_end", "order_status"],
       where: {
         $and: [
           // БД <= Start
@@ -58,10 +58,13 @@ module.exports = {
           // БД >= Start
           { date_end: { $gte: dateStart } },
         ],
+        order_status: {
+          $in: ["Забронирован", "Завершен"],
+        },
       },
     });
 
-    if (Object.keys(entries).length > 0) return ctx.throw(405, "Date-isBusy");
+    if (entries !== null) return ctx.throw(405, "Date-isBusy");
 
     reqUserData.date_start = dateStart;
     reqUserData.date_end = dateEnd;

@@ -8,10 +8,9 @@
 		<quasar-spinner v-if="isLoading" />
 
 		<!-- Сообщение об ошибке -->
-		<div
-			v-if="errorMessage.length > 0"
-			class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold"
-		>{{ errorMessage }}</div>
+		<div v-if="errorMessage.length > 0" class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold">{{
+			errorMessage
+		}}</div>
 
 		<!-- таблица заказов -->
 		<div class="q-pa-md w-full">
@@ -38,7 +37,7 @@
 						<td class="text-right">{{ orders.date_start }}</td>
 						<td class="text-right">{{ orders.date_end }}</td>
 						<td class="text-right">{{ orders.people_count }}</td>
-						<td class="text-right">В обработке</td>
+						<td class="text-right">{{ orders.order_status }}</td>
 					</tr>
 					<th colspan="5" v-if="myOrders.length < 1">
 						<div class="row no-wrap items-center">

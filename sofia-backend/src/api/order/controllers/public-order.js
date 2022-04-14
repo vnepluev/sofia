@@ -23,6 +23,9 @@ module.exports = {
           { date_start: { $gte: dateNow } },
           { date_end: { $lte: dateEnd } },
         ],
+        order_status: {
+          $in: ["Забронирован", "Завершен"],
+        },
       },
       orderBy: { id: "DESC" },
     });

@@ -8,50 +8,26 @@
 	https://www.cyberforum.ru/javascript-beginners/thread2545891.html
  -->
 <template>
-	<quasar-confirm
-		v-model="isNewOrder"
-		type="bg-teal"
-		text="Хотите сделать новый заказ?"
-		@isOk="addNewOrder"
-	/>
+	<quasar-confirm v-model="isNewOrder" type="bg-teal" text="Хотите сделать новый заказ?" @isOk="addNewOrder" />
 
-	<div
-		v-if="errorMessage.length > 0"
-		class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold"
-	>{{ errorMessage }}</div>
+	<div v-if="errorMessage.length > 0" class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold">{{
+		errorMessage
+	}}</div>
 
 	<div v-else class="q-pa-md q-gutter-sm text-center">
 		<div class="text-lg">Расписание выходов</div>
-		<div class="text-lg mb-4">яхта "Sofia"</div>
+		<q-select outlined v-model="yachtModel" :options="yachtArr" label="Выберите услугу" />
+
 		<quasar-spinner v-if="isLoading" />
 		<div class="subcontent" v-else>
 			<div class="row justify-center">
 				<div style="display: flex; max-width: 1200px; width: 100%; max-height: 500px;">
-					<q-calendar-day
-						ref="calendar"
-						locale="ru"
-						:hour24-format="true"
-						:interval-minutes="30"
-						:interval-count="48"
-						v-model="selectedDate"
-						view="day"
-						:max-days="10"
-						cell-width="200px"
-						weekday-align="right"
-						date-align="left"
-						date-header="inline"
-						no-active-date
-						animated
-						bordered
-						:selected-start-end-dates="['2022-03-29 13:00', '2022-03-29 13:30']"
-						@change="onChange"
-						@moved="onMoved"
-						@click-date="onClickDate"
-						@click-time="onClickTime"
-						@click-interval="onClickInterval"
-						@click-head-intervals="onClickHeadIntervals"
-						@click-head-day="onClickHeadDay"
-					>
+					<q-calendar-day ref="calendar" locale="ru" :hour24-format="true" :interval-minutes="30"
+						:interval-count="48" v-model="selectedDate" view="day" :max-days="10" cell-width="200px"
+						weekday-align="right" date-align="left" date-header="inline" no-active-date animated bordered
+						:selected-start-end-dates="['2022-03-29 13:00', '2022-03-29 13:30']" @change="onChange"
+						@moved="onMoved" @click-date="onClickDate" @click-time="onClickTime" @click-interval="onClickInterval"
+						@click-head-intervals="onClickHeadIntervals" @click-head-day="onClickHeadDay">
 						<!-- <template #head-day-event="{ scope: { timestamp } }">
 							<div style="display: flex; justify-content: center; flex-wrap: wrap; padding: 2px;">
 								<template v-for="event in eventsMap[timestamp.date]" :key="event.id">
@@ -81,12 +57,8 @@
 
 						<template #day-body="{ scope: { timestamp, timeStartPos, timeDurationHeight } }">
 							<template v-for="event in getEvents(timestamp.date)" :key="event.id">
-								<div
-									v-if="event.time !== undefined"
-									class="my-event"
-									:class="badgeClasses(event, 'body')"
-									:style="badgeStyles(event, 'body', timeStartPos, timeDurationHeight)"
-								>
+								<div v-if="event.time !== undefined" class="my-event" :class="badgeClasses(event, 'body')"
+									:style="badgeStyles(event, 'body', timeStartPos, timeDurationHeight)">
 									<div class="title q-calendar__ellipsis text-bold">
 										{{ event.title }}
 										<br />
@@ -133,6 +105,8 @@ export default defineComponent({
 	},
 	data() {
 		return {
+			yachtArr: ['Яхта "Sofia"'],
+			yachtModel: 'Яхта "Sofia"',
 			isNewOrder: false, // окно добавить новый заказ?
 			isLoading: true,
 			errorMessage: '',
