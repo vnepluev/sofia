@@ -18,6 +18,8 @@
 			<div class="q-gutter-md row items-start">
 				<q-input v-model="item.date_start" type="datetime" hint="Начало прогулки" />
 				<q-input v-model="item.date_end" type="datetime" hint="Завершение прогулки" />
+				<q-btn outline :color="intervalColor" :icon="intervalIcon" title="Проверить интервал"
+					:loading="isCheckIntervalLoading" @click.prevent="checkDataInterval" />
 			</div>
 
 			<!-- Оплата -->
@@ -93,10 +95,12 @@ export default {
 		const statusList = ['В обработке', 'Забронирован', 'Завершен', 'Отклонен'];
 		// яхта
 		const yachtList = ['sofia'];
+
 		// отмена редактирования
 		const cancel = () => {
 			$router.push('/admin/order-list/');
 		};
+
 		// обновляем данные на сервере
 		const ok = () => {
 			delete (item.value.user_id);
@@ -109,6 +113,27 @@ export default {
 					errorMessage.value = error.toString();
 				});
 		};
+
+		/**
+		 * проверяем, занято ли время
+		 */
+		const isCheckIntervalLoading = ref(false)
+		const intervalColor = ref('primary') // цвет кнопки 'проверка интервала'
+		const intervalIcon = ref('sync_problem') // иконка
+
+		const checkDataInterval = () => {
+			isCheckIntervalLoading.value = false
+
+			// api.post('/check-data-interval', {
+			// 	yacht_name: item.value.yacht_name,
+			// 	date_start: item.value.date_start,
+			// 	date_end: item.value.date_end
+			// })
+
+			intervalColor.value = 'secondary'
+			intervalIcon.value = 'thumb_up_alt'
+		}
+
 		return {
 			isError,
 			errorMessage,
@@ -117,6 +142,10 @@ export default {
 			yachtList,
 			ok,
 			cancel,
+			checkDataInterval,
+			isCheckIntervalLoading,
+			intervalColor,
+			intervalIcon
 		};
 	},
 	components: { QuasarAlert }
