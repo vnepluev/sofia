@@ -32,6 +32,16 @@ module.exports = {
         middlewares: [],
       },
     },
+    // Admin, User: проверка занятости интервала дат
+    {
+      method: "POST",
+      path: "/check-data-interval",
+      handler: "check-data-interval.checkDataInterval",
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
     // Админ: список заказов в диапазоне дат
     {
       method: "POST",

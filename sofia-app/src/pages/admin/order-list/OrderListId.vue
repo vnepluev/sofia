@@ -22,6 +22,11 @@
 					:loading="isCheckIntervalLoading" @click.prevent="checkDataInterval" />
 			</div>
 
+			<!-- Если ошибка с датой -->
+			<div class="q-gutter-md row items-start text-red-600 mt-4 ml-1" v-if="intervalErrorMessage.length > 0">
+				{{ intervalErrorMessage }}
+			</div>
+
 			<!-- Оплата -->
 			<div class="q-gutter-md row items-start mt-4">
 				<q-input v-model="item.pay" filled type="number" hint="Оплачено клиентом" />
@@ -118,20 +123,43 @@ export default {
 		 * проверяем, занято ли время
 		 */
 		const isCheckIntervalLoading = ref(false)
+		const intervalErrorMessage = ref('')
 		const intervalColor = ref('primary') // цвет кнопки 'проверка интервала'
-		const intervalIcon = ref('sync_problem') // иконка
+		const intervalIcon = ref('autorenew') // иконка 'thumb_down_off_alt' - занято
 
-		const checkDataInterval = () => {
-			isCheckIntervalLoading.value = false
+		const checkDataInterval = async () => {
+			isCheckIntervalLoading.value = true
+			let entries
+			try {
+				entries = await api.post('/check-data-interval', {
+					id: item.value.id,
+					yacht_name: item.value.yacht_name,
+					date_start: item.value.date_start,
+					date_end: item.value.date_end
+				})
+			} catch (error) {
+				intervalColor.value = 'red'
+				intervalIcon.value = 'report_gmailerrorred'
+				intervalErrorMessage.value = error.toString()
+			} finally {
+				isCheckIntervalLoading.value = false
+			}
 
-			// api.post('/check-data-interval', {
-			// 	yacht_name: item.value.yacht_name,
-			// 	date_start: item.value.date_start,
-			// 	date_end: item.value.date_end
-			// })
+			// если интервал свободен
+			if (entries?.status === 204) {
+				intervalErrorMessage.value = ''
+				intervalColor.value = 'secondary'
+				intervalIcon.value = 'thumb_up_alt'
+			}
 
-			intervalColor.value = 'secondary'
-			intervalIcon.value = 'thumb_up_alt'
+			// если интервал занят
+			if (entries?.data?.status === 'busy' || entries?.data?.length > 0) {
+				intervalErrorMessage.value = ''
+				intervalColor.value = 'red'
+				intervalIcon.value = 'thumb_down_off_alt'
+			}
+
+			console.log(entries);
 		}
 
 		return {
@@ -145,7 +173,8 @@ export default {
 			checkDataInterval,
 			isCheckIntervalLoading,
 			intervalColor,
-			intervalIcon
+			intervalIcon,
+			intervalErrorMessage
 		};
 	},
 	components: { QuasarAlert }
