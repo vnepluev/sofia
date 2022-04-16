@@ -10,6 +10,7 @@ module.exports = {
       where: {
         user_id: currentUserId,
       },
+      orderBy: { date_start: "desc" },
     });
 
     // удаляем лишние данные

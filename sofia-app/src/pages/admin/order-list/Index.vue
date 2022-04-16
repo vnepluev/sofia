@@ -99,6 +99,7 @@
 						</q-icon>
 					</template>
 				</q-input>
+				<q-toggle keep-color v-model="needAnswer" label="Заявки" />
 			</template>
 			<!-- /выбор даты -->
 		</q-table>
@@ -115,6 +116,7 @@ export default {
 	setup() {
 		const $store = useStore()
 		const errorMessage = ref('')
+		const needAnswer = ref(false)
 
 		// получаем диапазон текущей даты
 		const newDate = new Date().toLocaleString('en-US', {
@@ -143,11 +145,13 @@ export default {
 		 *
 		 * - дата начала
 		 * - дата завершения
+		 * - isAnswer - запрос всех заявок со статусом 'В обработке'
 		 */
-		const getOrders = async (dateStart, dateEnd) => {
+		const getOrders = async (dateStart, dateEnd, isAnswer = false) => {
 			const res = await $store.dispatch('auth/getOrderList', {
 				dateStart,
-				dateEnd
+				dateEnd,
+				answer: isAnswer
 			})
 			if (res !== false) errorMessage.value = res // если возникла ошибка
 			return $store.getters['auth/getOrderList']
@@ -176,6 +180,22 @@ export default {
 				dateEnd = model.value.to
 			}
 			rows.value = await getOrders(dateStart, dateEnd)
+			needAnswer.value = false
+		})
+
+		/**
+		 * При смене переключателя подтягиваем новые заявки с сервера
+		 */
+		watch(needAnswer, async (newValue, oldValue) => {
+			if (newValue) {
+				// дата начала / завершения нам не интересны
+				// когда запрашиваем новые заявки
+				rows.value = await getOrders(false, false, newValue)
+			} else if (oldValue === true) {
+				const currentDate = new Date().toISOString().split('T')[0]
+				rows.value = await getOrders(currentDate, currentDate)
+				model.value = currentDate
+			}
 		})
 
 		return {
@@ -186,6 +206,7 @@ export default {
 			model,
 			calcDate,
 			date,
+			needAnswer
 		}
 	}
 }

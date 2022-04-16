@@ -120,6 +120,7 @@ export const getOrderList = async ({ commit }, dateInterval) => {
     const orderList = await api.post('/private-order-list', {
       date_start: dateInterval.dateStart,
       date_end: dateInterval.dateEnd,
+      answer: dateInterval.answer,
     }) // массив с заказами
     commit('getOrderList', orderList?.data)
   } catch (error) {

@@ -15,6 +15,10 @@
 			</div>
 
 			<!-- Время старта -->
+			<div class="q-gutter-md row items-start mt-1 text-gray-400">
+				<div>{{ date.formatDate(item.date_start, 'HH:mm, YYYY/MM/DD') }}</div>
+				<div class="pl-6-md">{{ date.formatDate(item.date_end, 'HH:mm, YYYY/MM/DD') }}</div>
+			</div>
 			<div class="q-gutter-md row items-start">
 				<q-input v-model="item.date_start" type="datetime" hint="Начало прогулки" />
 				<q-input v-model="item.date_end" type="datetime" hint="Завершение прогулки" />
@@ -83,6 +87,7 @@ import { useStore } from 'vuex'
 import { ref } from 'vue'
 import { api } from 'src/boot/axios'
 import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
+import { date } from 'quasar'
 
 export default {
 	setup() {
@@ -96,6 +101,7 @@ export default {
 		const item = ref();
 
 		item.value = JSON.parse(JSON.stringify(order));
+
 		// статус
 		const statusList = ['В обработке', 'Забронирован', 'Завершен', 'Отклонен'];
 		// яхта
@@ -158,8 +164,6 @@ export default {
 				intervalColor.value = 'red'
 				intervalIcon.value = 'thumb_down_off_alt'
 			}
-
-			console.log(entries);
 		}
 
 		return {
@@ -174,7 +178,8 @@ export default {
 			isCheckIntervalLoading,
 			intervalColor,
 			intervalIcon,
-			intervalErrorMessage
+			intervalErrorMessage,
+			date
 		};
 	},
 	components: { QuasarAlert }

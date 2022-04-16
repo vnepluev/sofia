@@ -17,18 +17,22 @@ module.exports = {
     dateEnd.setDate(dateNow.getDate() + 10);
 
     const entries = await strapi.db.query("api::order.order").findMany({
-      select: ["id", "date_start", "date_end"],
+      select: ["id", "date_start", "date_end", "order_status"],
       where: {
         $and: [
           { date_start: { $gte: dateNow } },
           { date_end: { $lte: dateEnd } },
+          {
+            order_status: {
+              $in: ["Забронирован", "Завершен"],
+            },
+          },
         ],
-        order_status: {
-          $in: ["Забронирован", "Завершен"],
-        },
       },
       orderBy: { id: "DESC" },
     });
+
+    console.log(dateNow);
 
     const result = Object.keys(entries).map((el) => {
       entries[el].bgcolor = "blue"; // фоновый цвет

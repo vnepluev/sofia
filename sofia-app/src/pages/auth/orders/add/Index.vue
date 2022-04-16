@@ -71,7 +71,7 @@
 							label="Ватрушки" />
 
 						<div class="flex justify-between">
-							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 1" />
+							<q-btn class="w-1/3 bg-teal text-white glossy" type="button" label="<<" @click="step = 1" />
 							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Далее >"
 								:disable="!isForm2Valid" />
 						</div>
@@ -114,7 +114,7 @@
 						</q-card-section>
 
 						<div class="flex justify-between">
-							<q-btn class="w-1/3 bg-teal text-white glossy" type="submit" label="<<" @click="step = 2"
+							<q-btn class="w-1/3 bg-teal text-white glossy" type="button" label="<<" @click="step = 2"
 								:disable="isSubmit" />
 							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Отправить"
 								:disable="isSubmit" />
@@ -241,7 +241,7 @@ export default {
 		/**
 		 * Отправляем данные заказа на сервер
 		 */
-		const finalStep = async () => {
+		const finalStep = () => {
 			// форматирование даты
 			// new Date(year, month, date, hours, minutes, seconds, ms)
 			const dateStartArr = formData.date.split('-');
@@ -273,22 +273,18 @@ export default {
 
 			// отправляем данные на сервер
 			isSubmit.value = true
-			try {
-				await api.post('/create-order', finalData).then(() => {
-					// если ок
-					autoClose();
-				});
-			} catch (error) {
+
+			api.post('/create-order', finalData).then(() => {
+				// если ок
+				autoClose()
+			}).catch((error) => {
 				if (error.response.status === 405) {
-					errorMessage.value = 'Извините, выбранное вами время было забронировано ранее';
+					errorMessage.value = 'Извините, выбранное вами время было забронировано ранее'
 				} else {
-					errorMessage.value = error.toString();
+					errorMessage.value = error.toString()
 				}
-				isError.value = true;
-			} finally {
-				isSubmit.value = false // кнопки управления делаем активными
-			}
-			// console.log('Final data:', finalData);
+				isError.value = true
+			}).finally(() => { isSubmit.value = false }) // кнопки управления делаем активными
 		};
 
 		return {
