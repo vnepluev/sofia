@@ -32,8 +32,6 @@ module.exports = {
       orderBy: { id: "DESC" },
     });
 
-    console.log(dateNow);
-
     const result = Object.keys(entries).map((el) => {
       entries[el].bgcolor = "blue"; // фоновый цвет
       entries[el].title = "Забронировано"; // заголовок

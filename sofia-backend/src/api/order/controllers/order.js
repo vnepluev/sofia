@@ -16,10 +16,21 @@ module.exports = {
     const { date_start, date_end, people_count } = ctx.request.body;
     const { comment, promocode } = ctx.request.body;
     const { photo, sup_board, water_circle, yacht_name } = ctx.request.body;
+    const { sert_number, sert_booking_code, sert_done_code } = ctx.request.body;
     const currentUserId = ctx.state.user.id; // id текущего пользователя
 
     // Финальный объект
     const reqUserData = {};
+
+    // проверка сертификата
+    if (sert_number?.length > 0) {
+      if (sert_number?.length !== 16 || sert_booking_code?.length !== 3)
+        return ctx.throw(400, "Broken-Cert-Number");
+      reqUserData.sert_number = sert_number;
+      reqUserData.sert_booking_code = sert_booking_code;
+      if (reqUserData.sert_done_code?.length > 0)
+        reqUserData.sert_done_code = sert_done_code;
+    }
 
     // кол-во пассажиров (проверка на число)
     if (!isNaN(parseFloat(people_count)) && isFinite(people_count))

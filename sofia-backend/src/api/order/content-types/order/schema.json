@@ -46,16 +46,6 @@
     "promocode": {
       "type": "string"
     },
-    "sert_number": {
-      "type": "string",
-      "unique": true
-    },
-    "sert_booking_code": {
-      "type": "integer"
-    },
-    "sert_done_code": {
-      "type": "integer"
-    },
     "sert_activated": {
       "type": "boolean"
     },
@@ -98,6 +88,19 @@
         "Отклонен"
       ],
       "default": "В обработке"
+    },
+    "sert_booking_code": {
+      "type": "string",
+      "maxLength": 3
+    },
+    "sert_done_code": {
+      "type": "string",
+      "maxLength": 4
+    },
+    "sert_number": {
+      "type": "string",
+      "maxLength": 16,
+      "unique": true
     }
   }
 }

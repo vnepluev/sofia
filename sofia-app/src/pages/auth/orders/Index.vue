@@ -52,7 +52,7 @@
 		<!-- кнопки добавить новый заказ -->
 		<div class="q-pa-md q-gutter-sm">
 			<q-btn color="primary" to="/auth/orders/add" label="Новый заказ" />
-			<q-btn color="primary" label="Активация сертификата" />
+			<q-btn color="primary" to="/auth/orders/add/cert" label="Активация сертификата" />
 		</div>
 		<!-- /кнопки добавить новый заказ -->
 

@@ -1,5 +1,5 @@
 <template>
-	<new-order />
+	<new-order isCert />
 </template>
 
 <script>
