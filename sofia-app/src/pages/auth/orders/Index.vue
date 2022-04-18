@@ -1,6 +1,11 @@
 <!--
 	преобразование даты в локальный формат
 	http://old.code.mu/javascript/date/toLocaleString.html
+
+	q-btn - анимация загрузки
+	<template v-slot:loading>
+      <q-spinner-facebook />
+    </template>
 -->
 <template>
 	<q-page class="flex flex-center">
@@ -11,6 +16,25 @@
 		<div v-if="errorMessage.length > 0" class="q-pa-md q-gutter-sm text-center text-xl text-red font-bold">{{
 			errorMessage
 		}}</div>
+
+		<!-- Информация об оплате -->
+		<div v-if="!isLoading && errorMessage.length < 1" class="inline bg-yellow-100 rounded-borders mt-4"
+			style="max-width: 760px">
+			<div class="flex flex-center text-center q-pa-md font-medium">
+				После создания заказа, переведите 990 руб. на банковскую карту, по номеру телефона:&nbsp;<a
+					href="tel:+79050224000" class="text-primary">+79050224000</a>&nbsp;<i>(Валерий
+					Владимирович Н.)</i>
+				<br>
+				В комментарии к переводу укажите ваш логин на сайте, например: 9050224000&nbsp;<i>(больше ничего указывать
+					не нужно).</i>
+				<br>
+				Одобрение заявок проходит в ручном режиме (от 5 до 60 минут в рабочее время). Приезжайте за 10-15 минут
+				до начала прогулки. Если опаздываете, пожалуйста, предупредите нас заранее.
+				<br>
+				<br>
+				Активация сертификата проходит без предоплаты!
+			</div>
+		</div>
 
 		<!-- таблица заказов -->
 		<div class="q-pa-md w-full">
@@ -26,18 +50,18 @@
 					<tr class="text-white">
 						<th class="text-left text-white">Наименование</th>
 						<th class="text-right">Начало</th>
+						<th class="text-right">Статус</th>
 						<th class="text-right">Завершение</th>
 						<th class="text-right">Пассажиров</th>
-						<th class="text-right">Статус</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="hover-item" v-for="orders in myOrders" :key="orders.id">
 						<td class="text-left">{{ orders.yacht_name === 'sofia' ? 'Яхта "София"' : '' }}</td>
 						<td class="text-right">{{ orders.date_start }}</td>
+						<td class="text-right">{{ orders.order_status }}</td>
 						<td class="text-right">{{ orders.date_end }}</td>
 						<td class="text-right">{{ orders.people_count }}</td>
-						<td class="text-right">{{ orders.order_status }}</td>
 					</tr>
 					<th colspan="5" v-if="myOrders.length < 1">
 						<div class="row no-wrap items-center">
@@ -128,7 +152,11 @@ export default {
 			myOrders.value = await getMyOrders()
 		})
 
-		return { isLoading, errorMessage, myOrders }
+		return {
+			isLoading,
+			errorMessage,
+			myOrders,
+		}
 	},
 	components: { QuasarSpinner }
 }
