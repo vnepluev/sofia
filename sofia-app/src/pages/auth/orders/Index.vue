@@ -18,8 +18,8 @@
 		}}</div>
 
 		<!-- Информация об оплате -->
-		<div v-if="!isLoading && errorMessage.length < 1" class="inline bg-yellow-100 rounded-borders mt-4"
-			style="max-width: 760px">
+		<div v-if="!isLoading && errorMessage.length < 1 && isShowInfoMessage"
+			class="inline bg-yellow-100 rounded-borders mt-4" style="max-width: 760px">
 			<div class="flex flex-center text-center q-pa-md font-medium">
 				После создания заказа, переведите 990 руб. на банковскую карту, по номеру телефона:&nbsp;<a
 					href="tel:+79050224000" class="text-primary">+79050224000</a>&nbsp;<i>(Валерий
@@ -33,6 +33,7 @@
 				<br>
 				<br>
 				Активация сертификата проходит без предоплаты!
+				<a href="#" @click.prevent="isShowInfoMessage = false" class="text-primary">Скрыть</a>
 			</div>
 		</div>
 
@@ -41,13 +42,14 @@
 			<q-markup-table v-if="!isLoading && errorMessage.length < 1" separator="vertical" flat bordered>
 				<thead class="bg-teal glossy">
 					<tr>
-						<th colspan="5">
+						<th colspan="6">
 							<div class="row no-wrap items-center">
 								<div class="text-h5 q-ml-md text-white">Мои заказы</div>
 							</div>
 						</th>
 					</tr>
 					<tr class="text-white">
+						<th></th>
 						<th class="text-left text-white">Наименование</th>
 						<th class="text-right">Начало</th>
 						<th class="text-right">Статус</th>
@@ -57,6 +59,9 @@
 				</thead>
 				<tbody>
 					<tr class="hover-item" v-for="orders in myOrders" :key="orders.id">
+						<td @click="editOrder" :data-id="orders.id">
+							<q-btn flat round color="primary" title="Уточнить заказ" icon="drive_file_rename_outline" />
+						</td>
 						<td class="text-left">{{ orders.yacht_name === 'sofia' ? 'Яхта "София"' : '' }}</td>
 						<td class="text-right">{{ orders.date_start }}</td>
 						<td class="text-right">{{ orders.order_status }}</td>
@@ -152,10 +157,20 @@ export default {
 			myOrders.value = await getMyOrders()
 		})
 
+		/**
+		 * редактируем заказ
+		 */
+		const editOrder = (e) => {
+			const id = e.currentTarget.getAttribute('data-id')
+			console.log(id);
+		}
+
 		return {
 			isLoading,
 			errorMessage,
 			myOrders,
+			editOrder,
+			isShowInfoMessage: ref(true)
 		}
 	},
 	components: { QuasarSpinner }
