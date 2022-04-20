@@ -18,7 +18,7 @@
 		}}</div>
 
 		<!-- Информация об оплате -->
-		<div v-if="!isLoading && errorMessage.length < 1 && isShowInfoMessage"
+		<div v-if="!isLoading && errorMessage.length < 1 && isShowInfoMessage && !isComponentEditOrder"
 			class="inline bg-yellow-100 rounded-borders mt-4" style="max-width: 760px">
 			<div class="flex flex-center text-center q-pa-md font-medium">
 				После создания заказа, переведите 990 руб. на банковскую карту, по номеру телефона:&nbsp;<a
@@ -37,76 +37,58 @@
 			</div>
 		</div>
 
-		<!-- таблица заказов -->
-		<div class="q-pa-md w-full">
-			<q-markup-table v-if="!isLoading && errorMessage.length < 1" separator="vertical" flat bordered>
-				<thead class="bg-teal glossy">
-					<tr>
-						<th colspan="6">
+		<div v-if="!isComponentEditOrder" class="flex flex-center">
+			<!-- таблица заказов -->
+			<div class="q-pa-md w-full">
+				<q-markup-table v-if="!isLoading && errorMessage.length < 1" separator="vertical" flat bordered>
+					<thead class="bg-teal glossy">
+						<tr>
+							<th colspan="6">
+								<div class="row no-wrap items-center">
+									<div class="text-h6 q-ml-md text-white">Мои заказы</div>
+								</div>
+							</th>
+						</tr>
+						<tr class="text-white">
+							<th></th>
+							<th class="text-left text-white">Наименование</th>
+							<th class="text-right">Начало</th>
+							<th class="text-right">Статус</th>
+							<th class="text-right">Завершение</th>
+							<th class="text-right">Пассажиров</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="hover-item" v-for="orders in myOrders" :key="orders.id">
+							<td @click="editOrder" :data-id="orders.id">
+								<q-btn flat round color="primary" title="Уточнить заказ" icon="drive_file_rename_outline" />
+							</td>
+							<td class="text-left">{{ orders.yacht_name === 'sofia' ? 'Яхта "София"' : '' }}</td>
+							<td class="text-right">{{ orders.date_start }}</td>
+							<td class="text-right">{{ orders.order_status }}</td>
+							<td class="text-right">{{ orders.date_end }}</td>
+							<td class="text-right">{{ orders.people_count }}</td>
+						</tr>
+						<th colspan="5" v-if="myOrders.length < 1">
 							<div class="row no-wrap items-center">
-								<div class="text-h5 q-ml-md text-white">Мои заказы</div>
+								<div class="text-sm q-ml-md">Создайте свой первый заказ</div>
 							</div>
 						</th>
-					</tr>
-					<tr class="text-white">
-						<th></th>
-						<th class="text-left text-white">Наименование</th>
-						<th class="text-right">Начало</th>
-						<th class="text-right">Статус</th>
-						<th class="text-right">Завершение</th>
-						<th class="text-right">Пассажиров</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr class="hover-item" v-for="orders in myOrders" :key="orders.id">
-						<td @click="editOrder" :data-id="orders.id">
-							<q-btn flat round color="primary" title="Уточнить заказ" icon="drive_file_rename_outline" />
-						</td>
-						<td class="text-left">{{ orders.yacht_name === 'sofia' ? 'Яхта "София"' : '' }}</td>
-						<td class="text-right">{{ orders.date_start }}</td>
-						<td class="text-right">{{ orders.order_status }}</td>
-						<td class="text-right">{{ orders.date_end }}</td>
-						<td class="text-right">{{ orders.people_count }}</td>
-					</tr>
-					<th colspan="5" v-if="myOrders.length < 1">
-						<div class="row no-wrap items-center">
-							<div class="text-sm q-ml-md">Создайте свой первый заказ</div>
-						</div>
-					</th>
-				</tbody>
-			</q-markup-table>
-		</div>
-		<!-- /таблица заказов -->
+					</tbody>
+				</q-markup-table>
+			</div>
+			<!-- /таблица заказов -->
 
-		<!-- кнопки добавить новый заказ -->
-		<div class="q-pa-md q-gutter-sm">
-			<q-btn color="primary" to="/auth/orders/add" label="Новый заказ" />
-			<q-btn color="primary" to="/auth/orders/add/cert" label="Активация сертификата" />
+			<!-- кнопки добавить новый заказ -->
+			<div class="q-pa-md q-gutter-sm">
+				<q-btn color="primary" to="/auth/orders/add" label="Новый заказ" />
+				<q-btn color="primary" to="/auth/orders/add/cert" label="Активация сертификата" />
+			</div>
+			<!-- /кнопки добавить новый заказ -->
 		</div>
-		<!-- /кнопки добавить новый заказ -->
 
-		<!-- добавить новый заказ -->
-		<!-- <div class="q-pa-md block">
-			<q-btn class="glossy m-4" round color="primary" icon="add_circle_outline">
-				<q-menu
-					transition-show="scale"
-					transition-hide="scale"
-					anchor="center middle"
-					self="center middle"
-					:offset="[0, 10]"
-				>
-					<q-list style="min-width: 100px">
-						<q-item clickable v-close-popup class="hover-item" to="/auth/orders/add">
-							<q-item-section>Новый заказ</q-item-section>
-						</q-item>
-						<q-item clickable v-close-popup class="hover-item">
-							<q-item-section>Активация сертификата</q-item-section>
-						</q-item>
-					</q-list>
-				</q-menu>
-			</q-btn>
-		</div>-->
-		<!-- /добавить новый заказ -->
+		<!-- Редактируем заказ -->
+		<app-edit-order v-if="isComponentEditOrder" :data="currentOrderItem" @close="isComponentEditOrder = false" />
 	</q-page>
 </template>
 
@@ -114,12 +96,16 @@
 import { onBeforeMount, ref } from 'vue'
 import QuasarSpinner from 'src/components/UI/QuasarSpinner.vue'
 import { api } from 'src/boot/axios'
+import AppEditOrder from './AppEditOrder.vue'
 
 export default {
 	setup() {
 		const isLoading = ref(true)
 		const errorMessage = ref('')
 		const myOrders = ref([])
+
+		const isComponentEditOrder = ref(false) // подключаем компонент редактирования заказа
+		const currentOrderItem = ref() // текущий редактируемый объект
 
 		// получаем мои заказы с сервера
 		const getMyOrders = () => api.get('/my-orders')
@@ -161,8 +147,9 @@ export default {
 		 * редактируем заказ
 		 */
 		const editOrder = (e) => {
-			const id = e.currentTarget.getAttribute('data-id')
-			console.log(id);
+			isComponentEditOrder.value = true
+			const id = +e.currentTarget.getAttribute('data-id')
+			currentOrderItem.value = myOrders.value.find((el) => id === el.id)
 		}
 
 		return {
@@ -170,10 +157,12 @@ export default {
 			errorMessage,
 			myOrders,
 			editOrder,
-			isShowInfoMessage: ref(true)
+			isShowInfoMessage: ref(true),
+			currentOrderItem,
+			isComponentEditOrder
 		}
 	},
-	components: { QuasarSpinner }
+	components: { QuasarSpinner, AppEditOrder }
 }
 </script>
 
