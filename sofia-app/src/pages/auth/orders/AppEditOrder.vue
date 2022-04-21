@@ -1,29 +1,44 @@
 <template>
-	<!-- ШАГ 1-->
 	<q-page class="flex flex-center content-start lg:content-center">
 		<div class="p-4 space-y-4">
 			<div class="w-full q-card rounded-borders rounded-xl whitespace-pre-line">
 				<q-card-section>
 					<q-form class="p-4 space-y-4">
 						<!-- form data -->
-						<div class="text-sm">
-							{{
-								item.date_skip === 0 ? 'Для изменения даты внесите доплату 500 руб.'
-									: `Количество доступных переносов даты: ${item.date_skip}`
-							}}
-							<br>
-							За 24 часа до старта возможность редактирования данных пропадает.
+
+						<!-- Если ошибка сервера -->
+						<quasar-alert v-model="isError" title="Сервер вернул ошибку" :text="errorMessage" />
+
+						<!-- Информация -->
+						<div class="inline" style="max-width: 760px">
+							<div class="flex flex-center text-center q-pa-md font-medium bg-yellow-100 rounded-borders">
+								{{
+									item.date_skip === 0 ? 'Для изменения даты внесите доплату 500 руб.'
+										: `Количество доступных переносов даты: ${item.date_skip}`
+								}}
+								<br>
+								За 24 часа до старта возможность редактирования данных пропадает.
+							</div>
 						</div>
-						<div class="flex">
-							<q-input :disable="item.date_skip === 0" v-model="item.date" type="date" class="mr-3"
-								hint="дата начала" />
-							<q-input :disable="item.date_skip === 0" v-model="item.time" type="time" @change="changeTime"
-								hint="время" />
+
+						<!-- Дата начала / завершения -->
+						<div class="flex justify-around" :class="{ 'block-danger': isFormValidInterval }">
+							<div class="mr-3 flex p-2 pt-0" :class="{ 'block-danger': isErrorStartDate }">
+								<q-input :disable="item.date_skip === 0" v-model="item.date" type="date" class="mr-3"
+									hint="дата начала" />
+								<q-input :disable="item.date_skip === 0" v-model="item.time" type="time"
+									@change="changeStartTime" hint="время" />
+							</div>
+							<div class="mr-3 flex p-2 pt-0" :class="{ 'block-danger': isErrorEndDate }">
+								<q-input :disable="item.date_skip === 0" v-model="item.dateEnd" type="date" class="mr-3"
+									hint="дата завершения" />
+								<q-input :disable="item.date_skip === 0" v-model="item.timeEnd" type="time"
+									@change="changeEndTime" hint="время" />
+							</div>
 						</div>
-						<q-select outlined v-model="item.durationValue" :options="item.duration" label="Продолжительность" />
 
 						<div class="flex">
-							<div class="text-lg">Количество человек: {{ item.people_count }}</div>
+							<div class="text-lg mt-4">Количество человек: {{ item.people_count }}</div>
 							<q-slider v-model="item.people_count" :min="1" :max="12" label switch-label-side color="primary"
 								style="padding: 0 10px;" />
 						</div>
@@ -70,13 +85,14 @@
 			</div>
 		</div>
 	</q-page>
-	<!-- /ШАГ 1-->
 
 </template>
 
 <script>
-import { ref } from 'vue'
-import { date } from 'quasar'
+import { ref, watch } from 'vue'
+import { formatDateTime } from 'src/components/Helpers/FormatData.js'
+import { api } from 'src/boot/axios'
+import QuasarAlert from 'src/components/UI/QuasarAlert.vue'
 
 export default {
 	props: {
@@ -87,41 +103,128 @@ export default {
 	},
 	emits: ['close', 'change'],
 	setup(props) {
-		const item = ref(JSON.parse(JSON.stringify(props.data)))
+		// данные лежат в item
+		const item = ref(JSON.parse(JSON.stringify(props.data)));
+		const isFormValid = ref(false);
+		const isFormValidInterval = ref(false);
+		const errorMessage = ref('')
+		const isError = ref(false)
 
 		// преобразуем дату и время
-		const d = item.value.date_start.split(',')[0].split('.')
-		const d1 = date.buildDate({ year: d[2], month: d[1], date: d[0] })
+		const startDate = formatDateTime(item.value.date_start);
+		// eslint-disable-next-line prefer-destructuring
+		item.value.date = startDate[0];
+		// eslint-disable-next-line prefer-destructuring
+		item.value.time = startDate[1];
 
-		const t = item.value.date_start.split(',')[1].split(':')
-		const t1 = date.buildDate({ hours: t[0], minutes: t[1] })
+		const endDate = formatDateTime(item.value.date_end);
+		// eslint-disable-next-line prefer-destructuring
+		item.value.dateEnd = endDate[0];
+		// eslint-disable-next-line prefer-destructuring
+		item.value.timeEnd = endDate[1];
 
-		item.value.date = date.formatDate(d1, 'YYYY-MM-DD')
-		item.value.time = date.formatDate(t1, 'HH:mm')
+		// фото
+		item.value.photoValue = item.value.photo > 0;
+
+		// сапы / ватрушки
+		item.value.sup = ['Без сап борда', '1 сап борд (1 000 руб.)', '2 сап борда (2 000 руб.)'];
+		item.value.supValue = item.value.sup[item.value.sup_board];
+		item.value.waterCircle = ['Без ватрушки', '1 ватрушка (500 руб.)', '2 ватрушки (1 000 руб.)'];
+		item.value.waterCircleValue = item.value.waterCircle[item.value.water_circle];
 
 		// округляем время
-		const changeTime = () => {
+		const changeStartTime = () => {
 			const time = item.value.time.split('');
 			time[4] = '0';
 			item.value.time = time.join('');
 		};
 
-		// фото
-		item.value.photoValue = item.value.photo > 0
+		const changeEndTime = () => {
+			const time = item.value.timeEnd.split('');
+			time[4] = '0';
+			item.value.timeEnd = time.join('');
+		};
 
-		// сапы / ватрушки
-		item.value.sup = ['Без сап борда', '1 сап борд (1 000 руб.)', '2 сап борда (2 000 руб.)']
-		item.value.supValue = item.value.sup[item.value.sup_board]
-		item.value.waterCircle = ['Без ватрушки', '1 ватрушка (500 руб.)', '2 ватрушки (1 000 руб.)']
-		item.value.waterCircleValue = item.value.waterCircle[item.value.water_circle]
+		// проверяем даты
+		const isErrorStartDate = ref(false);
+		const isErrorEndDate = ref(false);
 
+		watch([
+			() => item.value.date,
+			() => item.value.time,
+			() => item.value.dateEnd,
+			() => item.value.timeEnd
+		], async (newValue) => {
+			const newStartDate = Date.parse(`${newValue[0]}T${newValue[1]}`);
+
+			if (Number.isNaN(newStartDate)) {
+				isErrorStartDate.value = true;
+			} else {
+				isErrorStartDate.value = false;
+			}
+
+			const newEndDate = Date.parse(`${newValue[2]}T${newValue[3]}`);
+			if (Number.isNaN(newEndDate)) {
+				isErrorEndDate.value = true;
+			} else {
+				isErrorEndDate.value = false;
+			}
+
+			const dateS = new Date(`${newValue[0]}T${newValue[1]}`)
+			const dateE = new Date(`${newValue[2]}T${newValue[3]}`)
+
+			if ((dateE - dateS) < 0) {
+				isFormValidInterval.value = true;
+			} else if (!Number.isNaN(newStartDate) && !Number.isNaN(newEndDate)) {
+				let entries;
+				try {
+					entries = await api.post('/check-data-interval', {
+						id: item.value.id,
+						yacht_name: item.value.yacht_name,
+						date_start: new Date(`${newValue[0]}T${newValue[1]}`).toUTCString(),
+						date_end: new Date(`${newValue[2]}T${newValue[3]}`).toUTCString(),
+					});
+				} catch (error) {
+					errorMessage.value = error.toString();
+					isError.value = true
+				}
+
+				// если интервал свободен
+				if (entries?.status === 204) {
+					isFormValidInterval.value = false;
+				}
+
+				// если интервал занят
+				if (entries?.data?.status === 'busy' || entries?.data?.length > 0) {
+					isFormValidInterval.value = true;
+				}
+			}
+		});
+
+		// проверка, менялись ли данные в заказе
+		watch(item.value, () => {
+			if (!isErrorStartDate.value && !isErrorEndDate.value) { isFormValid.value = true; } else { isFormValid.value = false; }
+		});
 		return {
 			item,
-			changeTime,
-		}
-	}
+			isFormValid,
+			isFormValidInterval,
+			changeStartTime,
+			changeEndTime,
+			isErrorStartDate,
+			isErrorEndDate,
+			isError,
+			errorMessage,
+
+		};
+	},
+	components: { QuasarAlert }
 }
 </script>
 
 <style lang="scss" scoped>
+.block-danger {
+	border: 1px solid red;
+	border-radius: 15px;
+}
 </style>

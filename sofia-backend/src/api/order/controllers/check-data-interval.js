@@ -6,6 +6,10 @@
  * date_end - дата завершения UTC
  * id - нужно для проверки каким событием занята дата
  * yacht_name - название яхты
+ *
+ * Возвращаем
+ * entries.status = "busy", если интервал занят
+ * 204 status - no-content
  */
 module.exports = {
   async checkDataInterval(ctx) {
