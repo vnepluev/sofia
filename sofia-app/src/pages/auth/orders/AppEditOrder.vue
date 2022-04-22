@@ -29,7 +29,7 @@
 								<q-input :disable="item.date_skip === 0" v-model="item.time" type="time"
 									@change="changeStartTime" hint="время" />
 							</div>
-							<div class="mr-3 flex p-2 pt-0" :class="{ 'block-danger': isErrorEndDate }">
+							<div class="flex mr-3 p-2 pt-0" :class="{ 'block-danger': isErrorEndDate }">
 								<q-input :disable="item.date_skip === 0" v-model="item.dateEnd" type="date" class="mr-3"
 									hint="дата завершения" />
 								<q-input :disable="item.date_skip === 0" v-model="item.timeEnd" type="time"
@@ -43,7 +43,7 @@
 								style="padding: 0 10px;" />
 						</div>
 
-						<div class="flex">
+						<div class="flex mr-3 p-2 pt-0" :class="{ 'block-danger': isCertError }">
 							<!--	Купон 000000-0000-0000
 									Код бронирования 000
 									Пин код 0000 -->
@@ -76,7 +76,8 @@
 							<q-btn class="w-1/3 bg-teal text-white glossy" type="button" label="Назад"
 								@click="$emit('close')" />
 							<q-btn class="w-3/5 bg-teal text-white glossy" type="submit" label="Сохранить"
-								@click="emit('change', item)" :disable="!isFormValid" />
+								@click="emit('change', item)" :disable="!isFormValid || isFormValidInterval || item.date_skip < 1 ||
+								item.order_status === 'Завершен' || item.order_status === 'Отклонен'" />
 						</div>
 
 						<!-- /form data -->
@@ -109,6 +110,7 @@ export default {
 		const isFormValidInterval = ref(false);
 		const errorMessage = ref('')
 		const isError = ref(false)
+		const isCertError = ref(false)
 
 		// преобразуем дату и время
 		const startDate = formatDateTime(item.value.date_start);
@@ -158,22 +160,23 @@ export default {
 			const newStartDate = Date.parse(`${newValue[0]}T${newValue[1]}`);
 
 			if (Number.isNaN(newStartDate)) {
-				isErrorStartDate.value = true;
+				isErrorStartDate.value = true
 			} else {
-				isErrorStartDate.value = false;
+				isErrorStartDate.value = false
 			}
 
 			const newEndDate = Date.parse(`${newValue[2]}T${newValue[3]}`);
 			if (Number.isNaN(newEndDate)) {
-				isErrorEndDate.value = true;
+				isErrorEndDate.value = true
 			} else {
-				isErrorEndDate.value = false;
+				isErrorEndDate.value = false
 			}
 
 			const dateS = new Date(`${newValue[0]}T${newValue[1]}`)
 			const dateE = new Date(`${newValue[2]}T${newValue[3]}`)
 
-			if ((dateE - dateS) < 0) {
+			// дата начала должна быть меньше даты старта и >= 1 часа
+			if ((dateE - dateS) < 3600000) {
 				isFormValidInterval.value = true;
 			} else if (!Number.isNaN(newStartDate) && !Number.isNaN(newEndDate)) {
 				let entries;
@@ -203,7 +206,26 @@ export default {
 
 		// проверка, менялись ли данные в заказе
 		watch(item.value, () => {
-			if (!isErrorStartDate.value && !isErrorEndDate.value) { isFormValid.value = true; } else { isFormValid.value = false; }
+			// проверяем поля сертификата
+			isCertError.value = false
+
+			if (item.value.sert_number?.length > 0
+				|| item.value.sert_booking_code?.length > 0
+				|| item.value.sert_done_code?.length > 0) {
+				if (item.value.sert_number?.length !== 16) {
+					isCertError.value = true
+				}
+				if (item.value.sert_booking_code?.length !== 3) {
+					isCertError.value = true
+				}
+				if (item.value.sert_done_code?.length > 0 && item.value.sert_done_code?.length !== 4) {
+					isCertError.value = true
+				}
+			}
+
+			if (!isErrorStartDate.value && !isErrorEndDate.value && !isCertError.value) {
+				isFormValid.value = true
+			} else { isFormValid.value = false }
 		});
 		return {
 			item,
@@ -215,7 +237,7 @@ export default {
 			isErrorEndDate,
 			isError,
 			errorMessage,
-
+			isCertError,
 		};
 	},
 	components: { QuasarAlert }
